@@ -39,3 +39,139 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 .calc-btn.op:hover{background:#ffa726;}
 </style>
 </head>
+<body>
+<div class="navbar">
+<div class="search-box">
+<div>🌐 Wikipedia Research Assistant</div>
+<button class="calc-toggle" onclick="toggleCalc()">Math Tool</button>
+</div>
+<div class="secret-btn" onclick="toggleDashboard()"></div>
+</div>
+<iframe id="wf" src="https://wikipedia.org" style="width:100%;height:calc(100% - 50px);border:none;"></iframe>
+
+<div id="calcBox" class="calc-box">
+<input type="text" id="calcDisplay" class="calc-screen" readonly value="0">
+<div class="calc-grid">
+<button class="calc-btn" onclick="clearCalc()">C</button>
+<button class="calc-btn" onclick="pressCalc('/')">/</button>
+<button class="calc-btn" onclick="pressCalc('*')">*</button>
+<button class="calc-btn" onclick="pressCalc('-')">-</button>
+<button class="calc-btn" onclick="pressCalc('7')">7</button>
+<button class="calc-btn" onclick="pressCalc('8')">8</button>
+<button class="calc-btn" onclick="pressCalc('9')">9</button>
+<button class="calc-btn op" onclick="pressCalc('+')">+</button>
+<button class="calc-btn" onclick="pressCalc('4')">4</button>
+<button class="calc-btn" onclick="pressCalc('5')">5</button>
+<button class="calc-btn" onclick="pressCalc('6')">6</button>
+<button class="calc-btn op" onclick="solveCalc()">=</button>
+<button class="calc-btn" onclick="pressCalc('1')">1</button>
+<button class="calc-btn" onclick="pressCalc('2')">2</button>
+<button class="calc-btn" onclick="pressCalc('3')">3</button>
+<button class="calc-btn" onclick="pressCalc('0')">0</button>
+</div>
+</div>
+
+<div class="ai-widget" onclick="toggleAI()">🤖</div>
+<div id="aiBox" class="ai-box">
+<div class="ai-header">Core Research Assistant v1.0</div>
+<div id="aiBody" class="ai-body">
+<div class="chat-msg msg-ai">Hello! Type a topic to search Wikipedia directly.</div>
+</div>
+<div class="ai-footer">
+<input type="text" id="aiInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendAIQuery()">
+<button onclick="sendAIQuery()">Ask</button>
+</div>
+</div>
+
+<div id="dash" class="dashboard">
+<div id="lock" class="lock-panel">
+<h3>SECURITY GATEWAY</h3>
+<input type="password" id="pw" placeholder="ACCESS CODE" onkeydown="if(event.key==='Enter') verify()">
+<button onclick="verify()">SUBMIT</button>
+</div>
+<div id="games" class="game-panel">
+<div class="menu">
+<button id="b-s" class="active" onclick="setG('s')">Smooth Snake</button>
+<button id="b-fb" onclick="setG('fb')">Flappy</button>
+</div>
+<div id="w-s" class="win active"><canvas id="c-s" width="300" height="300"></canvas><div>Score: <span id="s-s">0</span></div></div>
+<div id="w-fb" class="win"><canvas id="c-fb" width="320" height="320"></canvas><div>Score: <span id="s-f">0</span></div></div>
+<p style="color:#666;font-size:12px;margin-top:15px;">Press ESC key or click top-right dot to exit instantly</p>
+</div>
+</div>
+
+<script>
+let open=false,auth=false,mode='s',loop,over=false,aiOpen=false,calcOpen=false,calcExpr="";
+const games=['s','fb'];
+function toggleCalc(){calcOpen=!calcOpen;document.getElementById("calcBox").style.display=calcOpen?"block":"none";}
+function pressCalc(v){calcExpr+=v;document.getElementById("calcDisplay").value=calcExpr;}
+function clearCalc(){calcExpr="";document.getElementById("calcDisplay").value="0";}
+function solveCalc(){try{let res=eval(calcExpr);document.getElementById("calcDisplay").value=res||0;calcExpr=res?res.toString():"";}catch(e){document.getElementById("calcDisplay").value="Error";calcExpr="";}}
+function toggleAI(){aiOpen=!aiOpen;document.getElementById("aiBox").style.display=aiOpen?"flex":"none";}
+function sendAIQuery(){const input=document.getElementById("aiInput");const query=input.value.trim();if(!query)return;const body=document.getElementById("aiBody");const uMsg=document.createElement("div");uMsg.className="chat-msg msg-user";uMsg.innerText=query;body.appendChild(uMsg);input.value="";body.scrollTop=body.scrollHeight;setTimeout(()=>{const aiMsg=document.createElement("div");aiMsg.className="chat-msg msg-ai";aiMsg.innerText="Searching indexes...";body.appendChild(aiMsg);document.getElementById("wf").src="https://wikipedia.org/wiki/"+encodeURIComponent(query);body.scrollTop=body.scrollHeight;},400);}
+function toggleDashboard(){open=!open;document.getElementById("dash").style.display=open?"flex":"none";cancelAnimationFrame(loop);if(open&&auth)start();}
+function verify(){if(document.getElementById("pw").value==="S2G_250"){auth=true;document.getElementById("lock").style.display="none";document.getElementById("games").style.display="flex";start();}else{document.getElementById("pw").value="";}}
+function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';document.getElementById("b-"+id).className='b-'+id==='b-'+g?'active':'';});document.getElementById("w-"+g).className='win active';document.getElementById("b-"+g).className='active';start();}
+function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
+document.getElementById("c-s").addEventListener('click',()=>{if(over)start();});
+document.getElementById("c-fb").addEventListener('click',()=>{if(over)start();});
+
+let sn,sDir,nextDir,sf,sc,lastTime,moveTimer;
+function initS(){
+sn=[{x:140,y:140},{x:120,y:140},{x:100,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;
+const ctx=document.getElementById("c-s").getContext("2d");
+function sStep(timestamp){
+if(!open||!auth||over||mode!=='s')return;
+loop=requestAnimationFrame(sStep);
+let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
+if(moveTimer>=90){
+moveTimer=0;sDir={...nextDir};
+let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
+if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);
+sn.unshift(h);
+if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;spawnSf();}else{sn.pop();}
+}
+ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);
+ctx.fillStyle="#f44";ctx.fillRect(sf.x,sf.y,16,16);
+ctx.fillStyle="#4CAF50";sn.forEach((p,i)=>{
+ctx.fillStyle=i===0?"#81C784":"#4CAF50";
+ctx.fillRect(p.x,p.y,18,18);
+});
+document.getElementById("s-s").innerText=sc;
+}
+loop=requestAnimationFrame(sStep);
+}
+function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.random()*14)*20+10};}
+
+let bY,bV,pipes,fsc;
+function initF(){
+bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;
+const ctx=document.getElementById("c-fb").getContext("2d");
+function fStep(){
+if(!open||!auth||over||mode!=='fb')return;
+loop=requestAnimationFrame(fStep);
+bV+=0.4;bY+=bV;if(bY>310||bY<5)return drawOver("c-fb",ctx,320,320);
+if(pipes[pipes.length-1].x<180){let th=Math.floor(Math.random()*110)+30;pipes.push({x:320,t:th,b:230-th});}
+pipes.forEach((p,i)=>{p.x-=2;if(p.x<-40){pipes.splice(i,1);fsc++;}if(p.x<=74&&p.x+40>=56&&(bY-8<=p.t||bY+8>=320-p.b))return drawOver("c-fb",ctx,320,320);});
+ctx.fillStyle="#4ec0ca";ctx.fillRect(0,0,320,320);
+ctx.fillStyle="#73bf2e";pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,320-p.b,40,p.b);});
+ctx.fillStyle="#f8e71c";ctx.beginPath();ctx.arc(65,bY,9,0,Math.PI*2);ctx.fill();
+document.getElementById("s-f").innerText=fsc;
+}
+loop=requestAnimationFrame(fStep);
+}
+function start(){over=false;if(mode==='s')initS();else initF();}
+
+document.addEventListener("keydown",e=>{
+if(e.keyCode===27){if(open)toggleDashboard();return;}
+if(!open||!auth||over)return;
+if(mode=='s'){
+if(e.keyCode===37&&sDir.x===0)nextDir={x:-20,y:0};
+if(e.keyCode===38&&sDir.y===0)nextDir={x:0,y:-20};
+if(e.keyCode===39&&sDir.x===0)nextDir={x:20,y:0};
+if(e.keyCode===40&&sDir.y===0)nextDir={x:0,y:20};
+}else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38)){bV=-6.5;e.preventDefault();}
+});
+</script>
+</body>
+</html>
