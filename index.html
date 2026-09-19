@@ -1,95 +1,189 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wikipedia Research Assistant</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
-        .navbar { height: 45px; background: #fff; border-bottom: 1px solid #aaa; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
-        .secret-btn { width: 10px; height: 10px; background: #e0e0e0; border-radius: 50%; cursor: pointer; }
-        .overlay { display: none; position: absolute; top: 45px; left: 0; width: 100%; height: calc(100% - 45px); background: #111; color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 99; }
-        .menu { margin-bottom: 15px; }
-        button { padding: 8px 15px; margin: 0 5px; background: #444; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-        .win { display: none; } .win.active { display: block; }
-        canvas { background: #000; border: 2px solid #333; display: block; margin: auto; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; background: #f6f6f6; }
+        .navbar { height: 50px; background: #ffffff; border-bottom: 1px solid #a2a9b1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .logo { font-weight: bold; font-size: 18px; color: #202122; }
+        .secret-btn { width: 10px; height: 10px; background: #e0e0e0; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .secret-btn:hover { background: #3366cc; }
+        .content-container { height: calc(100% - 50px); position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .dashboard-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
+        .menu-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+        .menu-btn { padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: #444; color: white; }
+        .menu-btn:hover { background: #666; }
+        .menu-btn.active { background: #4CAF50; }
+        .game-window { display: none; flex-direction: column; align-items: center; }
+        .game-window.active { display: flex; }
+        canvas { background-color: #000; border: 4px solid #333; }
+        .score { font-size: 20px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="navbar"><div>🌐 Wiki Portal</div><div class="secret-btn" onclick="toggleDash()"></div></div>
-    <iframe src="https://wikipedia.org" style="width:100%; height:calc(100% - 45px); border:none;"></iframe>
-    
-    <div id="dash" class="overlay">
-        <div class="menu">
-            <button onclick="setGame('s')">Snake</button>
-            <button onclick="setGame('t')">Tetris</button>
-        </div>
-        <div id="sWin" class="win active"><canvas id="sc" width="300" height="300"></canvas><div id="ss">Score: 0</div></div>
-        <div id="tWin" class="win"><canvas id="tc" width="200" height="300"></canvas><div id="ts">Score: 0</div></div>
+    <div class="navbar">
+        <div class="logo">🌐 Wiki Research Portal v2.5</div>
+        <div class="secret-btn" onclick="toggleDashboard()" title="System Configuration"></div>
     </div>
-
+    <div class="content-container">
+        <iframe src="https://en.m.wikipedia.org/wiki/Main_Page"></iframe>
+        <div id="gameDashboard" class="dashboard-overlay">
+            <div class="menu-bar">
+                <button class="menu-btn active" id="snakeBtn" onclick="switchGame('snake')">Play Snake</button>
+                <button class="menu-btn" id="tetrisBtn" onclick="switchGame('tetris')">Play Tetris</button>
+            </div>
+            <div id="snakeWindow" class="game-window active">
+                <canvas id="snakeCanvas" width="400" height="400"></canvas>
+                <div class="score">Snake Score: <span id="snakeScoreVal">0</span></div>
+            </div>
+            <div id="tetrisWindow" class="game-window">
+                <canvas id="tetrisCanvas" width="240" height="400"></canvas>
+                <div class="score">Tetris Score: <span id="tetrisScoreVal">0</span></div>
+            </div>
+            <p style="color: #888; font-size: 12px; margin-top: 20px;">Click the secret dot in the top right to hide everything and return to Wiki</p>
+        </div>
+    </div>
     <script>
-        let active = false, mode = 's', sInt, tInt;
-        const sc = document.getElementById("sc"), sCtx = sc.getContext("2d");
-        const tc = document.getElementById("tc"), tCtx = tc.getContext("2d");
-        let snake = [{x:10,y:10}], sDx=1, sDy=0, food={x:5,y:5}, sScore=0;
-        let board = Array.from({length:15},()=>Array(10).fill(0)), tScore=0, piece;
-        const SHAPES = [[[1,1,1,1]],[[1,1,1],[0,1,0]],[[1,1],[1,1]],[[1,1,0],[0,1,1]]];
-
-        function toggleDash() {
-            active = !active;
-            document.getElementById("dash").style.display = active ? "flex" : "none";
-            clearInterval(sInt); clearInterval(tInt);
-            if (active) start();
-        }
-        function setGame(m) {
-            mode = m;
-            document.getElementById("sWin").className = m=='s'?'win active':'win';
-            document.getElementById("tWin").className = m=='t'?'win active':'win';
-            clearInterval(sInt); clearInterval(tInt); start();
-        }
-        function start() {
-            if(mode=='s') {
-                snake=[{x:10,y:10}]; sDx=1; sDy=0; sScore=0;
-                sInt = setInterval(()=>{
-                    let h = {x:snake[0].x+sDx, y:snake[0].y+sDy};
-                    if(h.x<0||h.x>=15||h.y<0||h.y>=15||snake.some(p=>p.x==h.x&&p.y==h.y)) return start();
-                    snake.unshift(h);
-                    if(h.x==food.x && h.y==food.y) { sScore+=10; food={x:Math.floor(Math.random()*15),y:Math.floor(Math.random()*15)}; } else snake.pop();
-                    sCtx.fillStyle="#000"; sCtx.fillRect(0,0,300,300);
-                    sCtx.fillStyle="#f00"; sCtx.fillRect(food.x*20,food.y*20,18,18);
-                    sCtx.fillStyle="#0f0"; snake.forEach(p=>sCtx.fillRect(p.x*20,p.y*20,18,18));
-                    document.getElementById("ss").innerText="Score: "+sScore;
-                },100);
+        let dashboardActive = false;
+        let currentGame = 'snake';
+        function toggleDashboard() {
+            const dashboard = document.getElementById("gameDashboard");
+            dashboardActive = !dashboardActive;
+            if (dashboardActive) {
+                dashboard.style.display = "flex";
+                startCurrentGame();
             } else {
-                board=Array.from({length:15},()=>Array(10).fill(0)); tScore=0; spawn();
-                tInt = setInterval(()=>{
-                    if(!col(piece,0,1)) piece.y++;
-                    else {
-                        piece.s.forEach((r,y)=>r.forEach((v,x)=>{if(v&&piece.y+y>=0) board[piece.y+y][piece.x+x]="#0ef";}));
-                        board = board.filter(r=>!r.every(v=>v)); while(board.length<15) { board.unshift(Array(10).fill(0)); tScore+=100; }
-                        spawn(); if(col(piece,0,0)) return start();
-                    }
-                    tCtx.fillStyle="#000"; tCtx.fillRect(0,0,200,300);
-                    board.forEach((r,y)=>r.forEach((v,x)=>{if(v){tCtx.fillStyle=v; tCtx.fillRect(x*20,y*20,19,19);}}));
-                    tCtx.fillStyle="#0ef"; piece.s.forEach((r,y)=>r.forEach((v,x)=>{if(v)tCtx.fillRect((piece.x+x)*20,(piece.y+y)*20,19,19);}));
-                    document.getElementById("ts").innerText="Score: "+tScore;
-                },400);
+                dashboard.style.display = "none";
+                stopAllGames();
             }
         }
-        function spawn() { piece = {s:SHAPES[Math.floor(Math.random()*SHAPES.length)],x:4,y:0}; }
-        function col(p,ox,oy) { return p.s.some((r,y)=>r.some((v,x)=>v&&(p.y+y+oy>=15||p.x+x+ox<0||p.x+x+ox>=10||board[p.y+y+oy][p.x+x+ox]))); }
-        
-        document.addEventListener("keydown", e => {
-            if(!active) return;
-            if(mode=='s') {
-                if(e.keyCode==37&&sDx!=1){sDx=-1;sDy=0;} if(e.keyCode==38&&sDy!=1){sDx=0;sDy=-1;}
-                if(e.keyCode==39&&sDx!=-1){sDx=1;sDy=0;} if(e.keyCode==40&&sDy!=-1){sDx=0;sDy=1;}
+        function switchGame(gameType) {
+            stopAllGames();
+            currentGame = gameType;
+            document.getElementById('snakeWindow').classList.remove('active');
+            document.getElementById('tetrisWindow').classList.remove('active');
+            document.getElementById('snakeBtn').classList.remove('active');
+            document.getElementById('tetrisBtn').classList.remove('active');
+            if(gameType === 'snake') {
+                document.getElementById('snakeWindow').classList.add('active');
+                document.getElementById('snakeBtn').classList.add('active');
             } else {
-                if(e.keyCode==37&&!col(piece,-1,0)) piece.x--; if(e.keyCode==39&&!col(piece,1,0)) piece.x++;
-                if(e.keyCode==40&&!col(piece,0,1)) piece.y++;
-                if(e.keyCode==38) {
-                    let r=piece.s[0].map((_,i)=>piece.s.map(row=>row[i]).reverse()), old=piece.s; piece.s=r;
-                    if(col(piece,0,0)) piece.s=old;
+                document.getElementById('tetrisWindow').classList.add('active');
+                document.getElementById('tetrisBtn').classList.add('active');
+            }
+            if(dashboardActive) startCurrentGame();
+        }
+        function startCurrentGame() {
+            if(currentGame === 'snake') resetSnake();
+            else resetTetris();
+        }
+        function stopAllGames() {
+            clearInterval(snakeInterval);
+            clearInterval(tetrisInterval);
+        }
+        const sCanvas = document.getElementById("snakeCanvas");
+        const sCtx = sCanvas.getContext("2d");
+        const sGrid = 20;
+        let snake = [{x: 10, y: 10}];
+        let food = {x: 5, y: 5};
+        let sDx = 1, sDy = 0, sScore = 0, snakeInterval;
+        function snakeTick() {
+            if (hasSnakeEnded()) { alert("Snake Over! Score: " + sScore); resetSnake(); return; }
+            sCtx.fillStyle = "#000"; sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
+            sCtx.fillStyle = "#FF5722"; sCtx.fillRect(food.x * sGrid, food.y * sGrid, sGrid-2, sGrid-2);
+            sCtx.fillStyle = "#4CAF50";
+            const head = {x: snake[0].x + sDx, y: snake[0].y + sDy};
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                sScore += 10; document.getElementById("snakeScoreVal").innerText = sScore;
+                food = {x: Math.floor(Math.random()*(sCanvas.width/sGrid)), y: Math.floor(Math.random()*(sCanvas.height/sGrid))};
+            } else { snake.pop(); }
+            snake.forEach(part => sCtx.fillRect(part.x * sGrid, part.y * sGrid, sGrid-2, sGrid-2));
+        }
+        function hasSnakeEnded() {
+            const h = snake[0];
+            for(let i=4; i<snake.length; i++) if(snake[i].x===h.x && snake[i].y===h.y) return true;
+            return h.x<0 || h.x>=(sCanvas.width/sGrid) || h.y<0 || h.y>=(sCanvas.height/sGrid);
+        }
+        function resetSnake() {
+            snake = [{x: 10, y: 10}]; sDx = 1; sDy = 0; sScore = 0;
+            document.getElementById("snakeScoreVal").innerText = sScore;
+            clearInterval(snakeInterval); snakeInterval = setInterval(snakeTick, 100);
+        }
+        const tCanvas = document.getElementById("tetrisCanvas");
+        const tCtx = tCanvas.getContext("2d");
+        const tGrid = 20;
+        const COLS = 12, ROWS = 20;
+        let board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+        let tetrisInterval, tScore = 0, currentPiece;
+        const SHAPES = [
+            [[1,1,1,1]],
+            [[1,1,1],[0,1,0]],
+            [[1,1,1],[1,0,0]],
+            [[1,1,1],[0,0,1]],
+            [[1,1],[1,1]],
+            [[1,1,0],[0,1,1]],
+            [[0,1,1],[1,1,0]]
+        ];
+        const COLORS = ["#00ffff", "#800080", "#0000ff", "#ff7f00", "#ffff00", "#00ff00", "#ff0000"];
+        function createPiece() {
+            let idx = Math.floor(Math.random() * SHAPES.length);
+            return { shape: SHAPES[idx], color: COLORS[idx], x: 4, y: 0 };
+        }
+        function drawTetris() {
+            tCtx.fillStyle = "#000"; tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
+            board.forEach((r, y) => r.forEach((v, x) => { if(v) { tCtx.fillStyle = v; tCtx.fillRect(x*tGrid, y*tGrid, tGrid-1, tGrid-1); }}));
+            tCtx.fillStyle = currentPiece.color;
+            currentPiece.shape.forEach((r, y) => r.forEach((v, x) => { if(v) tCtx.fillRect((currentPiece.x+x)*tGrid, (currentPiece.y+y)*tGrid, tGrid-1, tGrid-1); }));
+        }
+        function collide(p, ox=0, oy=0) {
+            return p.shape.some((r, y) => r.some((v, x) => {
+                if(!v) return false;
+                let ny = p.y + y + oy, nx = p.x + x + ox;
+                return ny >= ROWS || nx < 0 || nx >= COLS || (ny >= 0 && board[ny][nx]);
+            }));
+        }
+        function merge(p) {
+            p.shape.forEach((r, y) => r.forEach((v, x) => { if(v && p.y+y >= 0) board[p.y+y][p.x+x] = p.color; }));
+        }
+        function clearLines() {
+            board = board.filter(r => !r.every(v => v));
+            while(board.length < ROWS) { board.unshift(Array(COLS).fill(0)); tScore += 100; }
+            document.getElementById("tetrisScoreVal").innerText = tScore;
+        }
+        function tetrisTick() {
+            if (!collide(currentPiece, 0, 1)) { currentPiece.y++; } 
+            else {
+                merge(currentPiece); clearLines(); currentPiece = createPiece();
+                if(collide(currentPiece)) { alert("Tetris Over! Score: " + tScore); resetTetris(); return; }
+            }
+            drawTetris();
+        }
+        function resetTetris() {
+            board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+            tScore = 0; document.getElementById("tetrisScoreVal").innerText = tScore;
+            currentPiece = createPiece(); clearInterval(tetrisInterval); tetrisInterval = setInterval(tetrisTick, 400);
+        }
+        document.addEventListener("keydown", e => {
+            if (!dashboardActive) return;
+            if (currentGame === 'snake') {
+                if (e.keyCode === 37 && sDx !== 1)  { sDx = -1; sDy = 0; }
+                if (e.keyCode === 38 && sDy !== 1)  { sDx = 0;  sDy = -1; }
+                if (e.keyCode === 39 && sDx !== -1) { sDx = 1;  sDy = 0; }
+                if (e.keyCode === 40 && sDy !== -1) { sDx = 0;  sDy = 1; }
+            } else if (currentGame === 'tetris') {
+                if (e.keyCode === 37 && !collide(currentPiece, -1, 0)) currentPiece.x--;
+                if (e.keyCode === 39 && !collide(currentPiece, -1, 0)) currentPiece.x++;
+                if (e.keyCode === 40 && !collide(currentPiece, 0, 1))  currentPiece.y++;
+                if (e.keyCode === 38) {
+                    let r = currentPiece.shape.map((_, i) => currentPiece.shape.map(row => row[i]).reverse());
+                    let old = currentPiece.shape; currentPiece.shape = r;
+                    if(collide(currentPiece)) currentPiece.shape = old;
                 }
+                drawTetris();
             }
         });
     </script>
