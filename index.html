@@ -7,183 +7,291 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; background: #f6f6f6; }
         .navbar { height: 50px; background: #ffffff; border-bottom: 1px solid #a2a9b1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-        .logo { font-weight: bold; font-size: 18px; color: #202122; }
+        .search-box { display: flex; gap: 5px; }
+        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
+        button { padding: 5px 12px; background: #3366cc; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #4477dd; }
         .secret-btn { width: 10px; height: 10px; background: #e0e0e0; border-radius: 50%; cursor: pointer; transition: 0.2s; }
         .secret-btn:hover { background: #3366cc; }
         .content-container { height: calc(100% - 50px); position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
         .dashboard-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
-        .menu-bar { display: flex; gap: 15px; margin-bottom: 20px; }
-        .menu-btn { padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: #444; color: white; }
-        .menu-btn:hover { background: #666; }
+        .menu-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
+        .menu-btn { padding: 10px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: #333; color: white; transition: 0.2s; }
+        .menu-btn:hover { background: #555; }
         .menu-btn.active { background: #4CAF50; }
         .game-window { display: none; flex-direction: column; align-items: center; }
         .game-window.active { display: flex; }
-        canvas { background-color: #000; border: 4px solid #333; }
-        .score { font-size: 20px; margin-top: 10px; }
+        canvas { background-color: #000; border: 4px solid #333; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .score { font-size: 20px; margin-top: 10px; font-weight: bold; }
+        .controls-hint { color: #888; font-size: 12px; margin-top: 15px; text-align: center; }
     </style>
 </head>
 <body>
+
     <div class="navbar">
-        <div class="logo">🌐 Wiki Research Portal v2.5</div>
-        <div class="secret-btn" onclick="toggleDashboard()" title="System Configuration"></div>
+        <div class="search-box">
+            <input type="text" id="wikiQuery" placeholder="Search Wikipedia...">
+            <button onclick="searchWiki()">Search</button>
+        </div>
+        <div class="secret-btn" onclick="toggleDashboard()"></div>
     </div>
+
     <div class="content-container">
-        <iframe src="https://en.m.wikipedia.org/wiki/Main_Page"></iframe>
+        <iframe id="wikiFrame" src="https://en.m.wikipedia.org/wiki/Main_Page"></iframe>
+
         <div id="gameDashboard" class="dashboard-overlay">
             <div class="menu-bar">
-                <button class="menu-btn active" id="snakeBtn" onclick="switchGame('snake')">Play Snake</button>
-                <button class="menu-btn" id="tetrisBtn" onclick="switchGame('tetris')">Play Tetris</button>
+                <button class="menu-btn active" id="snakeBtn" onclick="switchGame('snake')">Snake</button>
+                <button class="menu-btn" id="tetrisBtn" onclick="switchGame('tetris')">Tetris</button>
+                <button class="menu-btn" id="pongBtn" onclick="switchGame('pong')">Pong</button>
+                <button class="menu-btn" id="brickBtn" onclick="switchGame('brick')">Brick Breaker</button>
             </div>
+
+            <!-- SNAKE -->
             <div id="snakeWindow" class="game-window active">
                 <canvas id="snakeCanvas" width="400" height="400"></canvas>
-                <div class="score">Snake Score: <span id="snakeScoreVal">0</span></div>
+                <div class="score">Score: <span id="snakeScore">0</span></div>
+                <div class="controls-hint">Use Arrow Keys to turn.</div>
             </div>
+
+            <!-- TETRIS -->
             <div id="tetrisWindow" class="game-window">
                 <canvas id="tetrisCanvas" width="240" height="400"></canvas>
-                <div class="score">Tetris Score: <span id="tetrisScoreVal">0</span></div>
+                <div class="score">Score: <span id="tetrisScore">0</span></div>
+                <div class="controls-hint">Left/Right: Move | Up: Rotate | Down: Soft Drop</div>
             </div>
-            <p style="color: #888; font-size: 12px; margin-top: 20px;">Click the secret dot in the top right to hide everything and return to Wiki</p>
+
+            <!-- PONG -->
+            <div id="pongWindow" class="game-window">
+                <canvas id="pongCanvas" width="500" height="350"></canvas>
+                <div class="score">Score: <span id="pongScore">0</span></div>
+                <div class="controls-hint">Use W/S or Up/Down arrows to move paddle. Defeat the AI!</div>
+            </div>
+
+            <!-- BRICK BREAKER -->
+            <div id="brickWindow" class="game-window">
+                <canvas id="brickCanvas" width="480" height="360"></canvas>
+                <div class="score">Score: <span id="brickScore">0</span></div>
+                <div class="controls-hint">Use Left/Right arrow keys to move the paddle.</div>
+            </div>
+
+            <p style="color: #555; font-size: 11px; margin-top: 15px;">Click the top-right dot to exit dashboard.</p>
         </div>
     </div>
+
     <script>
         let dashboardActive = false;
         let currentGame = 'snake';
+        let snakeInt, tetrisInt, pongInt, brickInt;
+
+        function searchWiki() {
+            const q = document.getElementById("wikiQuery").value;
+            if(q) document.getElementById("wikiFrame").src = "https://en.m.wikipedia.org/wiki/" + encodeURIComponent(q);
+        }
+
         function toggleDashboard() {
-            const dashboard = document.getElementById("gameDashboard");
+            const dash = document.getElementById("gameDashboard");
             dashboardActive = !dashboardActive;
             if (dashboardActive) {
-                dashboard.style.display = "flex";
-                startCurrentGame();
+                dash.style.display = "flex";
+                startGame();
             } else {
-                dashboard.style.display = "none";
+                dash.style.display = "none";
                 stopAllGames();
             }
         }
-        function switchGame(gameType) {
+
+        function switchGame(g) {
             stopAllGames();
-            currentGame = gameType;
-            document.getElementById('snakeWindow').classList.remove('active');
-            document.getElementById('tetrisWindow').classList.remove('active');
-            document.getElementById('snakeBtn').classList.remove('active');
-            document.getElementById('tetrisBtn').classList.remove('active');
-            if(gameType === 'snake') {
-                document.getElementById('snakeWindow').classList.add('active');
-                document.getElementById('snakeBtn').classList.add('active');
-            } else {
-                document.getElementById('tetrisWindow').classList.add('active');
-                document.getElementById('tetrisBtn').classList.add('active');
-            }
-            if(dashboardActive) startCurrentGame();
+            currentGame = g;
+            
+            const games = ['snake', 'tetris', 'pong', 'brick'];
+            games.forEach(game => {
+                document.getElementById(game + 'Window').classList.remove('active');
+                document.getElementById(game + 'Btn').classList.remove('active');
+            });
+
+            document.getElementById(g + 'Window').classList.add('active');
+            document.getElementById(g + 'Btn').classList.add('active');
+            
+            if(dashboardActive) startGame();
         }
-        function startCurrentGame() {
-            if(currentGame === 'snake') resetSnake();
-            else resetTetris();
-        }
+
         function stopAllGames() {
-            clearInterval(snakeInterval);
-            clearInterval(tetrisInterval);
+            clearInterval(snakeInt); clearInterval(tetrisInt); clearInterval(pongInt); clearInterval(brickInt);
         }
-        const sCanvas = document.getElementById("snakeCanvas");
-        const sCtx = sCanvas.getContext("2d");
-        const sGrid = 20;
-        let snake = [{x: 10, y: 10}];
-        let food = {x: 5, y: 5};
-        let sDx = 1, sDy = 0, sScore = 0, snakeInterval;
-        function snakeTick() {
-            if (hasSnakeEnded()) { alert("Snake Over! Score: " + sScore); resetSnake(); return; }
-            sCtx.fillStyle = "#000"; sCtx.fillRect(0, 0, sCanvas.width, sCanvas.height);
-            sCtx.fillStyle = "#FF5722"; sCtx.fillRect(food.x * sGrid, food.y * sGrid, sGrid-2, sGrid-2);
-            sCtx.fillStyle = "#4CAF50";
-            const head = {x: snake[0].x + sDx, y: snake[0].y + sDy};
-            snake.unshift(head);
-            if (head.x === food.x && head.y === food.y) {
-                sScore += 10; document.getElementById("snakeScoreVal").innerText = sScore;
-                food = {x: Math.floor(Math.random()*(sCanvas.width/sGrid)), y: Math.floor(Math.random()*(sCanvas.height/sGrid))};
-            } else { snake.pop(); }
-            snake.forEach(part => sCtx.fillRect(part.x * sGrid, part.y * sGrid, sGrid-2, sGrid-2));
+
+        function startGame() {
+            if(currentGame === 'snake') resetSnake();
+            else if(currentGame === 'tetris') resetTetris();
+            else if(currentGame === 'pong') resetPong();
+            else if(currentGame === 'brick') resetBrick();
         }
-        function hasSnakeEnded() {
-            const h = snake[0];
-            for(let i=4; i<snake.length; i++) if(snake[i].x===h.x && snake[i].y===h.y) return true;
-            return h.x<0 || h.x>=(sCanvas.width/sGrid) || h.y<0 || h.y>=(sCanvas.height/sGrid);
-        }
+
+        // --- SNAKE ---
+        const sCanvas = document.getElementById("snakeCanvas"), sCtx = sCanvas.getContext("2d");
+        let snake, food, sDx, sDy, sScore;
         function resetSnake() {
             snake = [{x: 10, y: 10}]; sDx = 1; sDy = 0; sScore = 0;
-            document.getElementById("snakeScoreVal").innerText = sScore;
-            clearInterval(snakeInterval); snakeInterval = setInterval(snakeTick, 100);
+            document.getElementById("snakeScore").innerText = sScore;
+            food = {x: 5, y: 5}; clearInterval(snakeInt);
+            snakeInt = setInterval(snakeTick, 90);
         }
-        const tCanvas = document.getElementById("tetrisCanvas");
-        const tCtx = tCanvas.getContext("2d");
-        const tGrid = 20;
-        const COLS = 12, ROWS = 20;
-        let board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-        let tetrisInterval, tScore = 0, currentPiece;
+        function snakeTick() {
+            const head = {x: snake[0].x + sDx, y: snake[0].y + sDy};
+            if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(p => p.x === head.x && p.y === head.y)) {
+                alert("Game Over! Score: " + sScore); resetSnake(); return;
+            }
+            snake.unshift(head);
+            if(head.x === food.x && head.y === food.y) {
+                sScore += 10; document.getElementById("snakeScore").innerText = sScore;
+                food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
+            } else { snake.pop(); }
+            sCtx.fillStyle = "#000"; sCtx.fillRect(0, 0, 400, 400);
+            sCtx.fillStyle = "#FF5722"; sCtx.fillRect(food.x*20, food.y*20, 18, 18);
+            sCtx.fillStyle = "#4CAF50"; snake.forEach(p => sCtx.fillRect(p.x*20, p.y*20, 18, 18));
+        }
+
+        // --- TETRIS ---
+        const tCanvas = document.getElementById("tetrisCanvas"), tCtx = tCanvas.getContext("2d");
+        let tBoard, tScore, tPiece;
         const SHAPES = [
             [[1,1,1,1]],
             [[1,1,1],[0,1,0]],
             [[1,1,1],[1,0,0]],
             [[1,1,1],[0,0,1]],
-            [[1,1],[1,1]],
             [[1,1,0],[0,1,1]],
-            [[0,1,1],[1,1,0]]
+            [[0,1,1],[1,1,0]],
+            [[1,1],[1,1]]
         ];
         const COLORS = ["#00ffff", "#800080", "#0000ff", "#ff7f00", "#ffff00", "#00ff00", "#ff0000"];
-        function createPiece() {
-            let idx = Math.floor(Math.random() * SHAPES.length);
-            return { shape: SHAPES[idx], color: COLORS[idx], x: 4, y: 0 };
+        function resetTetris() {
+            tBoard = Array.from({length: 20}, () => Array(12).fill(0)); tScore = 0;
+            document.getElementById("tetrisScore").innerText = tScore;
+            tPiece = tSpawn(); clearInterval(tetrisInt);
+            tetrisInt = setInterval(tetrisTick, 400);
         }
-        function drawTetris() {
-            tCtx.fillStyle = "#000"; tCtx.fillRect(0, 0, tCanvas.width, tCanvas.height);
-            board.forEach((r, y) => r.forEach((v, x) => { if(v) { tCtx.fillStyle = v; tCtx.fillRect(x*tGrid, y*tGrid, tGrid-1, tGrid-1); }}));
-            tCtx.fillStyle = currentPiece.color;
-            currentPiece.shape.forEach((r, y) => r.forEach((v, x) => { if(v) tCtx.fillRect((currentPiece.x+x)*tGrid, (currentPiece.y+y)*tGrid, tGrid-1, tGrid-1); }));
+        function tSpawn() {
+            let i = Math.floor(Math.random()*SHAPES.length);
+            return { s: SHAPES[i], c: COLORS[i], x: 4, y: 0 };
         }
-        function collide(p, ox=0, oy=0) {
-            return p.shape.some((r, y) => r.some((v, x) => {
+        function tCol(p, ox, oy) {
+            return p.s.some((r, y) => r.some((v, x) => {
                 if(!v) return false;
                 let ny = p.y + y + oy, nx = p.x + x + ox;
-                return ny >= ROWS || nx < 0 || nx >= COLS || (ny >= 0 && board[ny][nx]);
+                return ny >= 20 || nx < 0 || nx >= 12 || (ny >= 0 && tBoard[ny][nx]);
             }));
         }
-        function merge(p) {
-            p.shape.forEach((r, y) => r.forEach((v, x) => { if(v && p.y+y >= 0) board[p.y+y][p.x+x] = p.color; }));
-        }
-        function clearLines() {
-            board = board.filter(r => !r.every(v => v));
-            while(board.length < ROWS) { board.unshift(Array(COLS).fill(0)); tScore += 100; }
-            document.getElementById("tetrisScoreVal").innerText = tScore;
-        }
         function tetrisTick() {
-            if (!collide(currentPiece, 0, 1)) { currentPiece.y++; } 
+            if(!tCol(tPiece, 0, 1)) { tPiece.y++; }
             else {
-                merge(currentPiece); clearLines(); currentPiece = createPiece();
-                if(collide(currentPiece)) { alert("Tetris Over! Score: " + tScore); resetTetris(); return; }
+                tPiece.s.forEach((r, y) => r.forEach((v, x) => { if(v && tPiece.y+y >= 0) tBoard[tPiece.y+y][tPiece.x+x] = tPiece.c; }));
+                tBoard = tBoard.filter(r => !r.every(v => v));
+                while(tBoard.length < 20) { tBoard.unshift(Array(12).fill(0)); tScore += 100; }
+                document.getElementById("tetrisScore").innerText = tScore;
+                tPiece = tSpawn(); if(tCol(tPiece, 0, 0)) { alert("Game Over! Score: " + tScore); resetTetris(); return; }
             }
-            drawTetris();
+            tCtx.fillStyle = "#000"; tCtx.fillRect(0, 0, 240, 400);
+            tBoard.forEach((r, y) => r.forEach((v, x) => { if(v) { tCtx.fillStyle = v; tCtx.fillRect(x*20, y*20, 19, 19); }}));
+            tCtx.fillStyle = tPiece.c; tPiece.s.forEach((r, y) => r.forEach((v, x) => { if(v) tCtx.fillRect((tPiece.x+x)*20, (tPiece.y+y)*20, 19, 19); }));
         }
-        function resetTetris() {
-            board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-            tScore = 0; document.getElementById("tetrisScoreVal").innerText = tScore;
-            currentPiece = createPiece(); clearInterval(tetrisInterval); tetrisInterval = setInterval(tetrisTick, 400);
+
+        // --- PONG ---
+        const pCanvas = document.getElementById("pongCanvas"), pCtx = pCanvas.getContext("2d");
+        let paddleY, aiY, ballX, ballY, bDx, bDy, pScore;
+        function resetPong() {
+            paddleY = 140; aiY = 140; ballX = 250; ballY = 175; bDx = 3; bDy = 2; pScore = 0;
+            document.getElementById("pongScore").innerText = pScore;
+            clearInterval(pongInt); pongInt = setInterval(pongTick, 16);
         }
-        document.addEventListener("keydown", e => {
-            if (!dashboardActive) return;
-            if (currentGame === 'snake') {
-                if (e.keyCode === 37 && sDx !== 1)  { sDx = -1; sDy = 0; }
-                if (e.keyCode === 38 && sDy !== 1)  { sDx = 0;  sDy = -1; }
-                if (e.keyCode === 39 && sDx !== -1) { sDx = 1;  sDy = 0; }
-                if (e.keyCode === 40 && sDy !== -1) { sDx = 0;  sDy = 1; }
-            } else if (currentGame === 'tetris') {
-                if (e.keyCode === 37 && !collide(currentPiece, -1, 0)) currentPiece.x--;
-                if (e.keyCode === 39 && !collide(currentPiece, -1, 0)) currentPiece.x++;
-                if (e.keyCode === 40 && !collide(currentPiece, 0, 1))  currentPiece.y++;
-                if (e.keyCode === 38) {
-                    let r = currentPiece.shape.map((_, i) => currentPiece.shape.map(row => row[i]).reverse());
-                    let old = currentPiece.shape; currentPiece.shape = r;
-                    if(collide(currentPiece)) currentPiece.shape = old;
+        function pongTick() {
+            ballX += bDx; ballY += bDy;
+            if(ballY <= 0 || ballY >= 340) bDy = -bDy;
+            if(ballX <= 20) {
+                if(ballY >= paddleY && ballY <= paddleY + 70) { bDx = -bDx; pScore += 5; document.getElementById("pongScore").innerText = pScore; }
+                else { alert("AI Scored! Game Reset."); resetPong(); return; }
+            }
+            if(ballX >= 470) {
+                if(ballY >= aiY && ballY <= aiY + 70) { bDx = -bDx; }
+                else { pScore += 20; document.getElementById("pongScore").innerText = pScore; ballX = 250; bDx = -bDx; }
+            }
+            if(aiY + 35 < ballY && aiY < 280) aiY += 2.5;
+            else if(aiY + 35 > ballY && aiY > 0) aiY -= 2.5;
+            pCtx.fillStyle = "#000"; pCtx.fillRect(0, 0, 500, 350);
+            pCtx.fillStyle = "#fff"; pCtx.fillRect(10, paddleY, 10, 70); pCtx.fillRect(480, aiY, 10, 70);
+            pCtx.beginPath(); pCtx.arc(ballX, ballY, 6, 0, Math.PI*2); pCtx.fill();
+        }
+
+        // --- BRICK BREAKER ---
+        const bCanvas = document.getElementById("brickCanvas"), bCtx = bCanvas.getContext("2d");
+        let padX, brkBallX, brkBallY, brkDx, brkDy, bricks, bScoreCount;
+        function resetBrick() {
+            padX = 200; brkBallX = 240; brkBallY = 300; brkDx = 3; brkDy = -3; bScoreCount = 0;
+            document.getElementById("brickScore").innerText = bScoreCount;
+            bricks = [];
+            for(let c=0; c<6; c++) {
+                bricks[c] = [];
+                for(let r=0; r<3; r++) bricks[c][r] = { x: 0, y: 0, status: 1 };
+            }
+            clearInterval(brickInt); brickInt = setInterval(brickTick, 16);
+        }
+        function brickTick() {
+            brkBallX += brkDx; brkBallY += brkDy;
+            if(brkBallX <= 0 || brkBallX >= 470) brkDx = -brkDx;
+            if(brkBallY <= 0) brkDy = -brkDy;
+            if(brkBallY >= 345) {
+                if(brkBallX >= padX && brkBallX <= padX + 75) brkDy = -brkDy;
+                else { alert("Game Over!"); resetBrick(); return; }
+            }
+            for(let c=0; c<6; c++) {
+                for(let r=0; r<3; r++) {
+                    let b = bricks[c][r];
+                    if(b.status == 1) {
+                        if(brkBallX > b.x && brkBallX < b.x+65 && brkBallY > b.y && brkBallY < b.y+20) {
+                            brkDy = -brkDy; b.status = 0; bScoreCount += 10;
+                            document.getElementById("brickScore").innerText = bScoreCount;
+                            if(bScoreCount === 180) { alert("You Win!"); resetBrick(); return; }
+                        }
+                    }
                 }
-                drawTetris();
+            }
+            bCtx.fillStyle = "#000"; bCtx.fillRect(0, 0, 480, 360);
+            for(let c=0; c<6; c++) {
+                for(let r=0; r<3; r++) {
+                    if(bricks[c][r].status == 1) {
+                        let bx = (c*(65+10))+20, by = (r*(20+10))+30;
+                        bricks[c][r].x = bx; bricks[c][r].y = by;
+                        bCtx.fillStyle = "#FF5722"; bCtx.fillRect(bx, by, 65, 20);
+                    }
+                }
+            }
+            bCtx.fillStyle = "#00ffff"; bCtx.fillRect(padX, 345, 75, 10);
+            bCtx.fillStyle = "#fff"; bCtx.beginPath(); bCtx.arc(brkBallX, brkBallY, 6, 0, Math.PI*2); bCtx.fill();
+        }
+
+        // KEY LISTENERS
+        document.addEventListener("keydown", e => {
+            if(!dashboardActive) return;
+            if(currentGame === 'snake') {
+                if(e.keyCode === 37 && sDx !== 1)  { sDx = -1; sDy = 0; }
+                if(e.keyCode === 38 && sDy !== 1)  { sDx = 0;  sDy = -1; }
+                if(e.keyCode === 39 && sDx !== -1) { sDx = 1;  sDy = 0; }
+                if(e.keyCode === 40 && sDy !== -1) { sDx = 0;  sDy = 1; }
+            } else if(currentGame === 'tetris') {
+                if(e.keyCode === 37 && !tCol(tPiece, -1, 0)) tPiece.x--;
+                if(e.keyCode === 39 && !tCol(tPiece, 1, 0))  tPiece.x++;
+                if(e.keyCode === 40 && !tCol(tPiece, 0, 1))  tPiece.y++;
+                if(e.keyCode === 38) {
+                    let r = tPiece.s.map((_, i) => tPiece.s.map(row => row[i]).reverse());
+                    let old = tPiece.s; tPiece.s = r; if(tCol(tPiece, 0, 0)) tPiece.s = old;
+                }
+            } else if(currentGame === 'pong') {
+                if((e.keyCode === 38 || e.keyCode === 87) && paddleY > 0) paddleY -= 15;
+                if((e.keyCode === 40 || e.keyCode === 83) && paddleY < 280) paddleY += 15;
+            } else if(currentGame === 'brick') {
+                if(e.keyCode === 37 && padX > 0) padX -= 20;
+                if(e.keyCode === 39 && padX < 405) padX += 20;
             }
         });
     </script>
