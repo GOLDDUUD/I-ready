@@ -9,30 +9,31 @@
         .navbar { height: 50px; background: #ffffff; border-bottom: 1px solid #a2a9b1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
         .search-box { display: flex; gap: 5px; }
         input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
-        button { padding: 5px 12px; background: #3366cc; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #4477dd; }
+        .nav-btn { padding: 5px 12px; background: #3366cc; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .nav-btn:hover { background: #2a52be; }
         .secret-btn { width: 10px; height: 10px; background: #e0e0e0; border-radius: 50%; cursor: pointer; transition: 0.2s; }
         .secret-btn:hover { background: #3366cc; }
         .content-container { height: calc(100% - 50px); position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Dashboard Overlay */
         .dashboard-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
-        .menu-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .menu-btn { padding: 10px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: #333; color: white; transition: 0.2s; }
-        .menu-btn:hover { background: #555; }
+        .menu-btn:hover { background: #444; }
         .menu-btn.active { background: #4CAF50; }
-        .game-window { display: none; flex-direction: column; align-items: center; }
-        .game-window.active { display: flex; }
-        canvas { background-color: #000; border: 4px solid #333; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-        .score { font-size: 20px; margin-top: 10px; font-weight: bold; }
-        .controls-hint { color: #888; font-size: 12px; margin-top: 15px; text-align: center; }
+        .game-container { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 340px; }
+        .game-container.active { display: flex; }
+        canvas { background-color: #000; border: 3px solid #444; display: block; }
+        .score-board { font-size: 18px; margin-top: 8px; color: #aaa; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <div class="navbar">
         <div class="search-box">
-            <input type="text" id="wikiQuery" placeholder="Search Wikipedia...">
-            <button onclick="searchWiki()">Search</button>
+            <input type="text" id="wikiQuery" placeholder="Search Wikipedia Reference...">
+            <button class="nav-btn" onclick="searchWiki()">Search</button>
         </div>
         <div class="secret-btn" onclick="toggleDashboard()"></div>
     </div>
@@ -41,49 +42,58 @@
         <iframe id="wikiFrame" src="https://en.m.wikipedia.org/wiki/Main_Page"></iframe>
 
         <div id="gameDashboard" class="dashboard-overlay">
-            <div class="menu-bar">
-                <button class="menu-btn active" id="snakeBtn" onclick="switchGame('snake')">Snake</button>
-                <button class="menu-btn" id="tetrisBtn" onclick="switchGame('tetris')">Tetris</button>
-                <button class="menu-btn" id="pongBtn" onclick="switchGame('pong')">Pong</button>
-                <button class="menu-btn" id="brickBtn" onclick="switchGame('brick')">Brick Breaker</button>
+            <div class="menu-grid">
+                <button class="menu-btn active" id="btn-s" onclick="switchGame('s')">Snake</button>
+                <button class="menu-btn" id="btn-t" onclick="switchGame('t')">Tetris</button>
+                <button class="menu-btn" id="btn-p" onclick="switchGame('p')">Pong AI</button>
+                <button class="menu-btn" id="btn-b" onclick="switchGame('b')">Breaker</button>
+                <button class="menu-btn" id="btn-ttt" onclick="switchGame('ttt')">Tic-Tac-Toe</button>
+                <button class="menu-btn" id="btn-si" onclick="switchGame('si')">Invaders</button>
             </div>
 
             <!-- SNAKE -->
-            <div id="snakeWindow" class="game-window active">
-                <canvas id="snakeCanvas" width="400" height="400"></canvas>
-                <div class="score">Score: <span id="snakeScore">0</span></div>
-                <div class="controls-hint">Use Arrow Keys to turn.</div>
+            <div id="win-s" class="game-container active">
+                <canvas id="can-s" width="300" height="300"></canvas>
+                <div class="score-board">Score: <span id="score-s">0</span></div>
             </div>
 
             <!-- TETRIS -->
-            <div id="tetrisWindow" class="game-window">
-                <canvas id="tetrisCanvas" width="240" height="400"></canvas>
-                <div class="score">Score: <span id="tetrisScore">0</span></div>
-                <div class="controls-hint">Left/Right: Move | Up: Rotate | Down: Soft Drop</div>
+            <div id="win-t" class="game-container">
+                <canvas id="can-t" width="200" height="300"></canvas>
+                <div class="score-board">Lines: <span id="score-t">0</span></div>
             </div>
 
             <!-- PONG -->
-            <div id="pongWindow" class="game-window">
-                <canvas id="pongCanvas" width="500" height="350"></canvas>
-                <div class="score">Score: <span id="pongScore">0</span></div>
-                <div class="controls-hint">Use W/S or Up/Down arrows to move paddle. Defeat the AI!</div>
+            <div id="win-p" class="game-container">
+                <canvas id="can-p" width="400" height="260"></canvas>
+                <div class="score-board" id="score-p">Player: 0 | CPU: 0</div>
             </div>
 
             <!-- BRICK BREAKER -->
-            <div id="brickWindow" class="game-window">
-                <canvas id="brickCanvas" width="480" height="360"></canvas>
-                <div class="score">Score: <span id="brickScore">0</span></div>
-                <div class="controls-hint">Use Left/Right arrow keys to move the paddle.</div>
+            <div id="win-b" class="game-container">
+                <canvas id="can-b" width="360" height="280"></canvas>
+                <div class="score-board">Score: <span id="score-b">0</span></div>
             </div>
 
-            <p style="color: #555; font-size: 11px; margin-top: 15px;">Click the top-right dot to exit dashboard.</p>
+            <!-- TIC-TAC-TOE -->
+            <div id="win-ttt" class="game-container">
+                <canvas id="can-ttt" width="240" height="240"></canvas>
+                <div class="score-board" id="score-ttt">Your Turn (X)</div>
+            </div>
+
+            <!-- SPACE INVADERS -->
+            <div id="win-si" class="game-container">
+                <canvas id="can-si" width="340" height="300"></canvas>
+                <div class="score-board">Score: <span id="score-si">0</span></div>
+            </div>
+
+            <p style="color: #666; font-size: 11px; margin-top: 15px; font-family: monospace;">Click the top-right node to toggle dashboard privacy matrix.</p>
         </div>
     </div>
 
     <script>
-        let dashboardActive = false;
-        let currentGame = 'snake';
-        let snakeInt, tetrisInt, pongInt, brickInt;
+        let dashActive = false, curGame = 's', loops = {};
+        const games = ['s','t','p','b','ttt','si'];
 
         function searchWiki() {
             const q = document.getElementById("wikiQuery").value;
@@ -91,207 +101,212 @@
         }
 
         function toggleDashboard() {
-            const dash = document.getElementById("gameDashboard");
-            dashboardActive = !dashboardActive;
-            if (dashboardActive) {
-                dash.style.display = "flex";
-                startGame();
-            } else {
-                dash.style.display = "none";
-                stopAllGames();
-            }
+            dashActive = !dashActive;
+            document.getElementById("gameDashboard").style.display = dashActive ? "flex" : "none";
+            stopAll(); if(dashActive) startCurrent();
         }
 
         function switchGame(g) {
-            stopAllGames();
-            currentGame = g;
-            
-            const games = ['snake', 'tetris', 'pong', 'brick'];
-            games.forEach(game => {
-                document.getElementById(game + 'Window').classList.remove('active');
-                document.getElementById(game + 'Btn').classList.remove('active');
+            stopAll(); curGame = g;
+            games.forEach(id => {
+                document.getElementById('win-'+id).classList.remove('active');
+                document.getElementById('btn-'+id).classList.remove('active');
             });
-
-            document.getElementById(g + 'Window').classList.add('active');
-            document.getElementById(g + 'Btn').classList.add('active');
-            
-            if(dashboardActive) startGame();
+            document.getElementById('win-'+g).classList.add('active');
+            document.getElementById('btn-'+g).classList.add('active');
+            if(dashActive) startCurrent();
         }
 
-        function stopAllGames() {
-            clearInterval(snakeInt); clearInterval(tetrisInt); clearInterval(pongInt); clearInterval(brickInt);
+        function stopAll() { Object.keys(loops).forEach(k => clearInterval(loops[k])); loops = {}; }
+
+        function startCurrent() {
+            if(curGame === 's') initSnake();
+            else if(curGame === 't') initTetris();
+            else if(curGame === 'p') initPong();
+            else if(curGame === 'b') initBreaker();
+            else if(curGame === 'ttt') initTTT();
+            else if(curGame === 'si') initInvaders();
         }
 
-        function startGame() {
-            if(currentGame === 'snake') resetSnake();
-            else if(currentGame === 'tetris') resetTetris();
-            else if(currentGame === 'pong') resetPong();
-            else if(currentGame === 'brick') resetBrick();
+        // --- 1. SNAKE ENGINE ---
+        let s_sn, s_dir, s_f, s_sc;
+        function initSnake() {
+            s_sn = [{x:7,y:7}]; s_dir = {x:1,y:0}; s_sc = 0; spawnFood();
+            const c = document.getElementById("can-s"), ctx = c.getContext("2d");
+            loops.s = setInterval(() => {
+                let h = {x: s_sn[0].x + s_dir.x, y: s_sn[0].y + s_dir.y};
+                if(h.x<0||h.x>=15||h.y<0||h.y>=15||s_sn.some(p=>p.x===h.x&&p.y===h.y)) return initSnake();
+                s_sn.unshift(h);
+                if(h.x===s_f.x && h.y===s_f.y) { s_sc+=10; spawnFood(); } else s_sn.pop();
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,300,300);
+                ctx.fillStyle="#f44336"; ctx.fillRect(s_f.x*20+1,s_f.y*20+1,18,18);
+                ctx.fillStyle="#4CAF50"; s_sn.forEach(p=>ctx.fillRect(p.x*20+1,p.y*20+1,18,18));
+                document.getElementById("score-s").innerText = s_sc;
+            }, 120);
         }
+        function spawnFood() { s_f = {x:Math.floor(Math.random()*15),y:Math.floor(Math.random()*15)}; }
 
-        // --- SNAKE ---
-        const sCanvas = document.getElementById("snakeCanvas"), sCtx = sCanvas.getContext("2d");
-        let snake, food, sDx, sDy, sScore;
-        function resetSnake() {
-            snake = [{x: 10, y: 10}]; sDx = 1; sDy = 0; sScore = 0;
-            document.getElementById("snakeScore").innerText = sScore;
-            food = {x: 5, y: 5}; clearInterval(snakeInt);
-            snakeInt = setInterval(snakeTick, 90);
-        }
-        function snakeTick() {
-            const head = {x: snake[0].x + sDx, y: snake[0].y + sDy};
-            if(head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.some(p => p.x === head.x && p.y === head.y)) {
-                alert("Game Over! Score: " + sScore); resetSnake(); return;
-            }
-            snake.unshift(head);
-            if(head.x === food.x && head.y === food.y) {
-                sScore += 10; document.getElementById("snakeScore").innerText = sScore;
-                food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-            } else { snake.pop(); }
-            sCtx.fillStyle = "#000"; sCtx.fillRect(0, 0, 400, 400);
-            sCtx.fillStyle = "#FF5722"; sCtx.fillRect(food.x*20, food.y*20, 18, 18);
-            sCtx.fillStyle = "#4CAF50"; snake.forEach(p => sCtx.fillRect(p.x*20, p.y*20, 18, 18));
-        }
-
-        // --- TETRIS ---
-        const tCanvas = document.getElementById("tetrisCanvas"), tCtx = tCanvas.getContext("2d");
-        let tBoard, tScore, tPiece;
-        const SHAPES = [
+        // --- 2. TETRIS ENGINE ---
+        let t_bd, t_sc, t_p;
+        const t_sh = [
             [[1,1,1,1]],
             [[1,1,1],[0,1,0]],
-            [[1,1,1],[1,0,0]],
-            [[1,1,1],[0,0,1]],
             [[1,1,0],[0,1,1]],
-            [[0,1,1],[1,1,0]],
-            [[1,1],[1,1]]
+            [[1,1],[1,1]],
+            [[1,1,1],[1,0,0]]
         ];
-        const COLORS = ["#00ffff", "#800080", "#0000ff", "#ff7f00", "#ffff00", "#00ff00", "#ff0000"];
-        function resetTetris() {
-            tBoard = Array.from({length: 20}, () => Array(12).fill(0)); tScore = 0;
-            document.getElementById("tetrisScore").innerText = tScore;
-            tPiece = tSpawn(); clearInterval(tetrisInt);
-            tetrisInt = setInterval(tetrisTick, 400);
-        }
-        function tSpawn() {
-            let i = Math.floor(Math.random()*SHAPES.length);
-            return { s: SHAPES[i], c: COLORS[i], x: 4, y: 0 };
-        }
-        function tCol(p, ox, oy) {
-            return p.s.some((r, y) => r.some((v, x) => {
-                if(!v) return false;
-                let ny = p.y + y + oy, nx = p.x + x + ox;
-                return ny >= 20 || nx < 0 || nx >= 12 || (ny >= 0 && tBoard[ny][nx]);
-            }));
-        }
-        function tetrisTick() {
-            if(!tCol(tPiece, 0, 1)) { tPiece.y++; }
-            else {
-                tPiece.s.forEach((r, y) => r.forEach((v, x) => { if(v && tPiece.y+y >= 0) tBoard[tPiece.y+y][tPiece.x+x] = tPiece.c; }));
-                tBoard = tBoard.filter(r => !r.every(v => v));
-                while(tBoard.length < 20) { tBoard.unshift(Array(12).fill(0)); tScore += 100; }
-                document.getElementById("tetrisScore").innerText = tScore;
-                tPiece = tSpawn(); if(tCol(tPiece, 0, 0)) { alert("Game Over! Score: " + tScore); resetTetris(); return; }
-            }
-            tCtx.fillStyle = "#000"; tCtx.fillRect(0, 0, 240, 400);
-            tBoard.forEach((r, y) => r.forEach((v, x) => { if(v) { tCtx.fillStyle = v; tCtx.fillRect(x*20, y*20, 19, 19); }}));
-            tCtx.fillStyle = tPiece.c; tPiece.s.forEach((r, y) => r.forEach((v, x) => { if(v) tCtx.fillRect((tPiece.x+x)*20, (tPiece.y+y)*20, 19, 19); }));
-        }
-
-        // --- PONG ---
-        const pCanvas = document.getElementById("pongCanvas"), pCtx = pCanvas.getContext("2d");
-        let paddleY, aiY, ballX, ballY, bDx, bDy, pScore;
-        function resetPong() {
-            paddleY = 140; aiY = 140; ballX = 250; ballY = 175; bDx = 3; bDy = 2; pScore = 0;
-            document.getElementById("pongScore").innerText = pScore;
-            clearInterval(pongInt); pongInt = setInterval(pongTick, 16);
-        }
-        function pongTick() {
-            ballX += bDx; ballY += bDy;
-            if(ballY <= 0 || ballY >= 340) bDy = -bDy;
-            if(ballX <= 20) {
-                if(ballY >= paddleY && ballY <= paddleY + 70) { bDx = -bDx; pScore += 5; document.getElementById("pongScore").innerText = pScore; }
-                else { alert("AI Scored! Game Reset."); resetPong(); return; }
-            }
-            if(ballX >= 470) {
-                if(ballY >= aiY && ballY <= aiY + 70) { bDx = -bDx; }
-                else { pScore += 20; document.getElementById("pongScore").innerText = pScore; ballX = 250; bDx = -bDx; }
-            }
-            if(aiY + 35 < ballY && aiY < 280) aiY += 2.5;
-            else if(aiY + 35 > ballY && aiY > 0) aiY -= 2.5;
-            pCtx.fillStyle = "#000"; pCtx.fillRect(0, 0, 500, 350);
-            pCtx.fillStyle = "#fff"; pCtx.fillRect(10, paddleY, 10, 70); pCtx.fillRect(480, aiY, 10, 70);
-            pCtx.beginPath(); pCtx.arc(ballX, ballY, 6, 0, Math.PI*2); pCtx.fill();
-        }
-
-        // --- BRICK BREAKER ---
-        const bCanvas = document.getElementById("brickCanvas"), bCtx = bCanvas.getContext("2d");
-        let padX, brkBallX, brkBallY, brkDx, brkDy, bricks, bScoreCount;
-        function resetBrick() {
-            padX = 200; brkBallX = 240; brkBallY = 300; brkDx = 3; brkDy = -3; bScoreCount = 0;
-            document.getElementById("brickScore").innerText = bScoreCount;
-            bricks = [];
-            for(let c=0; c<6; c++) {
-                bricks[c] = [];
-                for(let r=0; r<3; r++) bricks[c][r] = { x: 0, y: 0, status: 1 };
-            }
-            clearInterval(brickInt); brickInt = setInterval(brickTick, 16);
-        }
-        function brickTick() {
-            brkBallX += brkDx; brkBallY += brkDy;
-            if(brkBallX <= 0 || brkBallX >= 470) brkDx = -brkDx;
-            if(brkBallY <= 0) brkDy = -brkDy;
-            if(brkBallY >= 345) {
-                if(brkBallX >= padX && brkBallX <= padX + 75) brkDy = -brkDy;
-                else { alert("Game Over!"); resetBrick(); return; }
-            }
-            for(let c=0; c<6; c++) {
-                for(let r=0; r<3; r++) {
-                    let b = bricks[c][r];
-                    if(b.status == 1) {
-                        if(brkBallX > b.x && brkBallX < b.x+65 && brkBallY > b.y && brkBallY < b.y+20) {
-                            brkDy = -brkDy; b.status = 0; bScoreCount += 10;
-                            document.getElementById("brickScore").innerText = bScoreCount;
-                            if(bScoreCount === 180) { alert("You Win!"); resetBrick(); return; }
-                        }
-                    }
+        function initTetris() {
+            t_bd = Array.from({length:15},()=>Array(10).fill(0)); t_sc = 0; newPiece();
+            const c = document.getElementById("can-t"), ctx = c.getContext("2d");
+            loops.t = setInterval(() => {
+                if(!tCol(t_p,0,1)) t_p.y++;
+                else {
+                    t_p.s.forEach((r,y)=>r.forEach((v,x)=>{if(v&&t_p.y+y>=0) t_bd[t_p.y+y][t_p.x+x]=1;}));
+                    t_bd = t_bd.filter(r=>!r.every(v=>v)); while(t_bd.length<15) { t_bd.unshift(Array(10).fill(0)); t_sc++; }
+                    newPiece(); if(tCol(t_p,0,0)) return initTetris();
                 }
-            }
-            bCtx.fillStyle = "#000"; bCtx.fillRect(0, 0, 480, 360);
-            for(let c=0; c<6; c++) {
-                for(let r=0; r<3; r++) {
-                    if(bricks[c][r].status == 1) {
-                        let bx = (c*(65+10))+20, by = (r*(20+10))+30;
-                        bricks[c][r].x = bx; bricks[c][r].y = by;
-                        bCtx.fillStyle = "#FF5722"; bCtx.fillRect(bx, by, 65, 20);
-                    }
-                }
-            }
-            bCtx.fillStyle = "#00ffff"; bCtx.fillRect(padX, 345, 75, 10);
-            bCtx.fillStyle = "#fff"; bCtx.beginPath(); bCtx.arc(brkBallX, brkBallY, 6, 0, Math.PI*2); bCtx.fill();
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,200,300);
+                t_bd.forEach((r,y)=>r.forEach((v,x)=>{if(v){ctx.fillStyle="#00bcd4";ctx.fillRect(x*20,y*20,19,19);}}));
+                ctx.fillStyle="#ffeb3b"; t_p.s.forEach((r,y)=>r.forEach((v,x)=>{if(v)ctx.fillRect((t_p.x+x)*20,(t_p.y+y)*20,19,19);}));
+                document.getElementById("score-t").innerText = t_sc;
+            }, 450);
+        }
+        function newPiece() { t_p = {s:t_sh[Math.floor(Math.random()*t_sh.length)],x:4,y:0}; }
+        function tCol(p,ox,oy) { return p.s.some((r,y)=>r.some((v,x)=>v&&(p.y+y+oy>=15||p.x+x+ox<0||p.x+x+ox>=10||t_bd[p.y+y+oy][p.x+x+ox]))); }
+
+        // --- 3. PONG ENGINE ---
+        let p_y, cp_y, b_x, b_y, b_dx, b_dy, p_sc, cp_sc;
+        function initPong() {
+            p_y=95; cp_y=95; b_x=200; b_y=130; b_dx=3; b_dy=2; p_sc=0; cp_sc=0;
+            const c = document.getElementById("can-p"), ctx = c.getContext("2d");
+            loops.p = setInterval(() => {
+                b_x+=b_dx; b_y+=b_dy;
+                if(b_y<=5||b_y>=255) b_dy=-b_dy;
+                if(cp_y+35 < b_y) cp_y+=2.2; else if(cp_y+35 > b_y) cp_y-=2.2;
+                if(b_x<=25 && b_y>=p_y && b_y<=p_y+70) { b_dx=-b_dx; b_dx*=1.05; }
+                if(b_x>=375 && b_y>=cp_y && b_y<=cp_y+70) { b_dx=-b_dx; b_dx*=1.05; }
+                if(b_x<0) { cp_sc++; b_x=200; b_y=130; b_dx=-3; }
+                if(b_x>400) { p_sc++; b_x=200; b_y=130; b_dx=3; }
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,400,260);
+                ctx.fillStyle="#fff"; ctx.fillRect(15,p_y,10,70); ctx.fillRect(375,cp_y,10,70);
+                ctx.beginPath(); ctx.arc(b_x,b_y,6,0,Math.PI*2); ctx.fill();
+                document.getElementById("score-p").innerText = `Player: ${p_sc} | CPU: ${cp_sc}`;
+            }, 1000/60);
         }
 
-        // KEY LISTENERS
+        // --- 4. BRICK BREAKER ---
+        let br_x, br_bx, br_by, br_bdx, br_bdy, br_list, br_sc;
+        function initBreaker() {
+            br_x=145; br_bx=180; br_by=200; br_bdx=2; br_bdy=-2; br_sc=0; br_list=[];
+            for(let r=0;r<4;r++) for(let c=0;c<6;c++) br_list.push({x:c*55+15,y:r*20+30,v:1});
+            const canv = document.getElementById("can-b"), ctx = canv.getContext("2d");
+            loops.b = setInterval(() => {
+                br_bx+=br_bdx; br_by+=br_bdy;
+                if(br_bx<=6||br_bx>=354) br_bdx=-br_bdx; if(br_by<=6) br_bdy=-br_bdy;
+                if(br_by>=260 && br_bx>=br_x && br_bx<=br_x+70) br_bdy=-br_bdy;
+                if(br_by>280) return initBreaker();
+                br_list.forEach(b => {
+                    if(b.v && br_bx>=b.x && br_bx<=b.x+50 && br_by>=b.y && br_by<=b.y+15) { b.v=0; br_bdy=-br_bdy; br_sc+=10; }
+                });
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,360,280);
+                ctx.fillStyle="#00ff00"; ctx.fillRect(br_x,265,70,10);
+                ctx.fillStyle="#ff5722"; ctx.beginPath(); ctx.arc(br_bx,br_by,6,0,Math.PI*2); ctx.fill();
+                ctx.fillStyle="#3f51b5"; br_list.forEach(b=>{if(b.v) ctx.fillRect(b.x,b.y,50,15);});
+                document.getElementById("score-b").innerText = br_sc;
+                if(br_list.every(b=>!b.v)) return initBreaker();
+            }, 1000/60);
+        }
+
+        // --- 5. TIC-TAC-TOE ---
+        let ttt_grid;
+        function initTTT() {
+            ttt_grid = Array(9).fill(0); drawTTT();
+            document.getElementById("score-ttt").innerText = "Your Turn (X)";
+        }
+        function drawTTT() {
+            const c = document.getElementById("can-ttt"), ctx = c.getContext("2d");
+            ctx.fillStyle="#000"; ctx.fillRect(0,0,240,240);
+            ctx.strokeStyle="#444"; ctx.lineWidth=4;
+            ctx.beginPath(); ctx.moveTo(80,0); ctx.lineTo(80,240); ctx.moveTo(160,0); ctx.lineTo(160,240);
+            ctx.moveTo(0,80); ctx.lineTo(240,80); ctx.moveTo(0,160); ctx.lineTo(240,160); ctx.stroke();
+            ctx.lineWidth=5;
+            ttt_grid.forEach((v,i) => {
+                let x = (i%3)*80+40, y = Math.floor(i/3)*80+40;
+                if(v === 1) { ctx.strokeStyle="#2196f3"; ctx.beginPath(); ctx.moveTo(x-20,y-20); ctx.lineTo(x+20,y+20); ctx.moveTo(x+20,y-20); ctx.lineTo(x-20,y+20); ctx.stroke(); }
+                else if(v === 2) { ctx.strokeStyle="#ff9800"; ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.stroke(); }
+            });
+        }
+        document.getElementById("can-ttt").addEventListener("click", e => {
+            if(curGame!=='ttt'||!dashActive) return;
+            const rect = e.target.getBoundingClientRect();
+            let mx = e.clientX - rect.left, my = e.clientY - rect.top;
+            let idx = Math.floor(mx/80) + Math.floor(my/80)*3;
+            if(ttt_grid[idx]===0) {
+                ttt_grid[idx] = 1; drawTTT();
+                if(checkTTT(1)) { document.getElementById("score-ttt").innerText = "You Win!"; return; }
+                if(ttt_grid.every(v=>v!==0)) { document.getElementById("score-ttt").innerText = "Tie Game!"; return; }
+                document.getElementById("score-ttt").innerText = "CPU thinking...";
+                setTimeout(() => {
+                    let empty = ttt_grid.map((v,i)=>v===0?i:null).filter(v=>v!==null);
+                    if(empty.length) ttt_grid[empty[Math.floor(Math.random()*empty.length)]] = 2;
+                    drawTTT();
+                    if(checkTTT(2)) { document.getElementById("score-ttt").innerText = "CPU Wins!"; return; }
+                    document.getElementById("score-ttt").innerText = "Your Turn (X)";
+                }, 400);
+            }
+        });
+        function checkTTT(p) {
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return lines.some(l => l.every(i => ttt_grid[i]===p));
+        }
+
+        // --- 6. SPACE INVADERS ---
+        let si_x, si_lasers, si_inv, si_sc, si_dir;
+        function initInvaders() {
+            si_x=155; si_lasers=[]; si_inv=[]; si_sc=0; si_dir=1;
+            for(let r=0;r<3;r++) for(let c=0;c<6;c++) si_inv.push({x:c*40+30,y:r*25+30,v:1});
+            const canv = document.getElementById("can-si"), ctx = canv.getContext("2d");
+            loops.si = setInterval(() => {
+                let shift = false;
+                si_inv.forEach(i=>{ if(i.v && (i.x<=10 || i.x>=310)) shift=true; });
+                if(shift) { si_dir=-si_dir; si_inv.forEach(i=>{ if(i.v) i.y+=10; }); }
+                si_inv.forEach(i=>{ if(i.v) i.x += si_dir*1.2; if(i.v && i.y>=250) return initInvaders(); });
+                si_lasers.forEach((l,li)=>{
+                    l.y-=4; if(l.y<0) si_lasers.splice(li,1);
+                    si_inv.forEach(i=>{ if(i.v && l.x>=i.x && l.x<=i.x+25 && l.y>=i.y && l.y<=i.y+15) { i.v=0; si_lasers.splice(li,1); si_sc+=20; }});
+                });
+                ctx.fillStyle="#000"; ctx.fillRect(0,0,340,300);
+                ctx.fillStyle="#e91e63"; si_inv.forEach(i=>{if(i.v) ctx.fillRect(i.x,i.y,25,15);});
+                ctx.fillStyle="#00ff00"; ctx.fillRect(si_x,280,30,12);
+                ctx.fillStyle="#ffeb3b"; si_lasers.forEach(l=>ctx.fillRect(l.x,l.y,3,10));
+                document.getElementById("score-si").innerText = si_sc;
+                if(si_inv.every(i=>!i.v)) return initInvaders();
+            }, 1000/60);
+        }
+
+        // Global Event Routing Matrix
         document.addEventListener("keydown", e => {
-            if(!dashboardActive) return;
-            if(currentGame === 'snake') {
-                if(e.keyCode === 37 && sDx !== 1)  { sDx = -1; sDy = 0; }
-                if(e.keyCode === 38 && sDy !== 1)  { sDx = 0;  sDy = -1; }
-                if(e.keyCode === 39 && sDx !== -1) { sDx = 1;  sDy = 0; }
-                if(e.keyCode === 40 && sDy !== -1) { sDx = 0;  sDy = 1; }
-            } else if(currentGame === 'tetris') {
-                if(e.keyCode === 37 && !tCol(tPiece, -1, 0)) tPiece.x--;
-                if(e.keyCode === 39 && !tCol(tPiece, 1, 0))  tPiece.x++;
-                if(e.keyCode === 40 && !tCol(tPiece, 0, 1))  tPiece.y++;
-                if(e.keyCode === 38) {
-                    let r = tPiece.s.map((_, i) => tPiece.s.map(row => row[i]).reverse());
-                    let old = tPiece.s; tPiece.s = r; if(tCol(tPiece, 0, 0)) tPiece.s = old;
+            if(!dashActive) return;
+            if(curGame === 's') {
+                if(e.keyCode===37 && s_dir.x!==1)  { s_dir={x:-1,y:0}; }
+                if(e.keyCode===38 && s_dir.y!==1)  { s_dir={x:0,y:-1}; }
+                if(e.keyCode===39 && s_dir.x!==-1) { s_dir={x:1,y:0}; }
+                if(e.keyCode===40 && s_dir.y!==-1) { s_dir={x:0,y:1}; }
+            } else if(curGame === 't') {
+                if(e.keyCode===37 && !tCol(t_p,-1,0)) t_p.x--;
+                if(e.keyCode===39 && !tCol(t_p,1,0))  t_p.x++;
+                if(e.keyCode===40 && !tCol(t_p,0,1))  t_p.y++;
+                if(e.keyCode===38) {
+                    let r = t_p.s.map((_, i) => t_p.s.map(row => row[i]).reverse()), old=t_p.s;
+                    t_p.s = r; if(tCol(t_p,0,0)) t_p.s = old;
                 }
-            } else if(currentGame === 'pong') {
-                if((e.keyCode === 38 || e.keyCode === 87) && paddleY > 0) paddleY -= 15;
-                if((e.keyCode === 40 || e.keyCode === 83) && paddleY < 280) paddleY += 15;
-            } else if(currentGame === 'brick') {
-                if(e.keyCode === 37 && padX > 0) padX -= 20;
-                if(e.keyCode === 39 && padX < 405) padX += 20;
+            } else if(curGame === 'p') {
+                if(e.keyCode===38 && p_y>0) p_y-=15; if(e.keyCode===40 && p_y<190) p_y+=15;
+            } else if(curGame === 'b') {
+                if(e.keyCode===37 && br_x>0) br_x-=20; if(e.keyCode===39 && br_x<290) br_x+=20;
+            } else if(curGame === 'si') {
+                if(e.keyCode===37 && si_x>0) si_x-=15; if(e.keyCode===39 && si_x<310) si_x+=15;
+                if(e.keyCode===32) { si_lasers.push({x:si_x+14, y:275}); e.preventDefault(); }
             }
         });
     </script>
