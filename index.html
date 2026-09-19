@@ -1,154 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Wikipedia Research Assistant</title>
-<style>
-body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;background:#f6f6f6;}
-.navbar{height:50px;background:#fff;border-bottom:1px solid #aaa;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
-.search-box{display:flex;align-items:center;gap:10px;}
-.calc-toggle{padding:6px 12px;background:#ff9800;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:bold;}
-.calc-toggle:hover{background:#e65100;}
-.secret-btn{width:10px;height:10px;background:#e0e0e0;border-radius:50%;cursor:pointer;}
-.dashboard{display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#111;color:#fff;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
-.lock-panel{display:flex;flex-direction:column;align-items:center;background:#222;padding:20px;border-radius:8px;}
-.lock-panel input{padding:8px;background:#000;color:#0f0;border:1px solid #444;border-radius:4px;text-align:center;margin-bottom:10px;}
-.game-panel{display:none;flex-direction:column;align-items:center;}
-.menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:15px;}
-button.g-btn{padding:8px 12px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:12px;}
-button.g-btn.active{background:#4CAF50;}
-.win{display:none;flex-direction:column;align-items:center;} .win.active{display:flex;}
-canvas{background:#000;border:3px solid #444;cursor:pointer;}
-.ai-widget{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:#3366cc;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:1000;}
-.ai-box{display:none;position:fixed;bottom:90px;right:20px;width:300px;height:350px;background:#fff;border:1px solid #ccc;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:1000;flex-direction:column;}
-.ai-header{background:#3366cc;color:white;padding:10px;font-weight:bold;font-size:13px;border-top-left-radius:7px;border-top-right-radius:7px;}
-.ai-body{flex:1;padding:10px;overflow-y:auto;background:#f9f9f9;font-size:12px;display:flex;flex-direction:column;gap:6px;}
-.chat-msg{padding:6px 10px;border-radius:6px;max-width:80%;word-wrap:break-word;}
-.msg-ai{background:#e2eafd;color:#202122;align-self:flex-start;}
-.msg-user{background:#3366cc;color:white;align-self:flex-end;}
-.ai-footer{display:flex;padding:8px;border-top:1px solid #eee;}
-.ai-footer input{flex:1;padding:6px;border:1px solid #ccc;border-radius:4px;outline:none;}
-.ai-footer button{padding:6px 12px;background:#3366cc;color:white;border:none;border-radius:4px;margin-left:4px;cursor:pointer;}
-.calc-box{display:none;position:fixed;top:70px;left:20px;width:200px;background:#333;padding:12px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:1001;}
-.calc-screen{width:100%;height:35px;background:#a1b5a1;color:#000;border:none;border-radius:4px;text-align:right;padding:5px;font-size:16px;font-family:monospace;margin-bottom:8px;box-sizing:border-box;}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
-.calc-btn{padding:8px;background:#555;color:#fff;border:none;border-radius:4px;font-weight:bold;cursor:pointer;}
-.calc-btn.op{background:#ff9800;}
-</style>
-</head>
-<body>
-<div class="navbar">
-<div class="search-box">
-<div>🌐 Wikipedia Research Assistant</div>
-<button class="calc-toggle" onclick="toggleCalc()">Math Tool</button>
-</div>
-<div class="secret-btn" onclick="toggleDash()"></div>
-</div>
-<iframe id="wf" src="https://wikipedia.org" style="width:100%;height:calc(100% - 50px);border:none;"></iframe>
+<iframe 
+  src="https://github.io" 
+  width="800" 
+  height="600" 
+  scrolling="no" 
+  frameborder="0" 
+  allowfullscreen>
+</iframe>
+```
 
-<div id="calcBox" class="calc-box">
-<input type="text" id="calcDisplay" class="calc-screen" readonly value="0">
-<div class="calc-grid">
-<button class="calc-btn" onclick="clearCalc()">C</button>
-<button class="calc-btn" onclick="pressCalc('/')">/</button>
-<button class="calc-btn" onclick="pressCalc('*')">*</button>
-<button class="calc-btn" onclick="pressCalc('-')">-</button>
-<button class="calc-btn" onclick="pressCalc('7')">7</button>
-<button class="calc-btn" onclick="pressCalc('8')">8</button>
-<button class="calc-btn" onclick="pressCalc('9')">9</button>
-<button class="calc-btn op" onclick="pressCalc('+')">+</button>
-<button class="calc-btn" onclick="pressCalc('4')">4</button>
-<button class="calc-btn" onclick="pressCalc('5')">5</button>
-<button class="calc-btn" onclick="pressCalc('6')">6</button>
-<button class="calc-btn op" onclick="solveCalc()">=</button>
-<button class="calc-btn" onclick="pressCalc('1')">1</button>
-<button class="calc-btn" onclick="pressCalc('2')">2</button>
-<button class="calc-btn" onclick="pressCalc('3')">3</button>
-<button class="calc-btn" onclick="pressCalc('0')">0</button>
-</div>
-</div>
+### How to Host It on GitHub
 
-<div class="ai-widget" onclick="toggleAI()">🤖</div>
-<div id="aiBox" class="ai-box">
-<div class="ai-header">Core Research Assistant v1.0</div>
-<div id="aiBody" class="ai-body">
-<div class="chat-msg msg-ai">Hello! Type a topic to search Wikipedia directly.</div>
-</div>
-<div class="ai-footer">
-<input type="text" id="aiInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter') sendAIQuery()">
-<button onclick="sendAIQuery()">Ask</button>
-</div>
-</div>
+1. **Find a Repository:** Fork an open-source Slope repository on GitHub, such as [cgolden15/Slope-Game](https://github.com/cgolden15/Slope-Game) or [stockalpha0/slope](https://github.com/stockalpha0/slope).
+2. **Enable GitHub Pages:** Go to your repository's **Settings** > **Pages**, then set the source branch to `main` (or `master`) to deploy the site.
+3. **Get Your URL:** Use your assigned GitHub Pages URL inside the `src` attribute of your iframe.
 
-<div id="dash" class="dashboard">
-<div id="lock" class="lock-panel">
-<h3>SECURITY GATEWAY</h3>
-<input type="password" id="pw" placeholder="ACCESS CODE" onkeydown="if(event.key==='Enter') verify()">
-<button onclick="verify()">SUBMIT</button>
-</div>
-<div id="games" class="game-panel">
-<div class="menu-grid">
-<button id="b-s" class="g-btn active" onclick="setG('s')">Snake</button>
-<button id="b-fb" class="g-btn" onclick="setG('fb')">Flappy</button>
-<button id="b-p" class="g-btn" onclick="setG('p')">Pong</button>
-<button id="b-b" class="g-btn" onclick="setG('b')">Breaker</button>
-<button id="b-ttt" class="g-btn" onclick="setG('ttt')">TicTacToe</button>
-<button id="b-si" class="g-btn" onclick="setG('si')">Invaders</button>
-<button id="b-run" class="g-btn" onclick="setG('run')">Runner</button>
-<button id="b-m" class="g-btn" onclick="setG('m')">Maze</button>
-<button id="b-ast" class="g-btn" onclick="setG('ast')">Asteroids</button>
-<button id="b-cl" class="g-btn" onclick="setG('cl')">Clicker</button>
-</div>
-<div id="w-s" class="win active"><canvas id="c-s" width="300" height="300"></canvas><div>Score: <span id="s-s">0</span></div></div>
-<div id="w-fb" class="win"><canvas id="c-fb" width="320" height="320"></canvas><div>Score: <span id="s-fb">0</span></div></div>
-<div id="w-p" class="win"><canvas id="c-p" width="400" height="240"></canvas><div>Score: <span id="s-p">0 - 0</span></div></div>
-<div id="w-b" class="win"><canvas id="c-b" width="360" height="260"></canvas><div>Score: <span id="s-b">0</span></div></div>
-<div id="w-ttt" class="win"><canvas id="c-ttt" width="240" height="240"></canvas><div id="s-ttt" style="font-family:monospace;">Your Turn</div></div>
-<div id="w-si" class="win"><canvas id="c-si" width="320" height="280"></canvas><div>Score: <span id="s-si">0</span></div></div>
-<div id="w-run" class="win"><canvas id="c-run" width="300" height="300"></canvas><div>Score: <span id="s-run">0</span></div></div>
-<div id="w-m" class="win"><canvas id="c-m" width="300" height="300"></canvas><div style="font-family:monospace;">Get to the yellow square!</div></div>
-<div id="w-ast" class="win"><canvas id="c-ast" width="320" height="300"></canvas><div>Score: <span id="s-ast">0</span></div></div>
-<div id="w-cl" class="win"><canvas id="c-cl" width="260" height="260"></canvas><div>Clicks: <span id="s-cl">0</span></div></div>
-<p style="color:#666;font-size:12px;margin-top:10px;">Press ESC key or click top-right dot to exit instantly</p>
-</div>
-</div>
-<script>
-let open=false,auth=false,mode='s',loop,over=false,aiOpen=false,calcOpen=false,calcExpr="";
-const games=['s','fb','p','b','ttt','si','run','m','ast','cl'];
-function toggleCalc(){calcOpen=!calcOpen;document.getElementById("calcBox").style.display=calcOpen?"block":"none";}
-function pressCalc(v){calcExpr+=v;document.getElementById("calcDisplay").value=calcExpr;}
-function clearCalc(){calcExpr="";document.getElementById("calcDisplay").value="0";}
-function solveCalc(){try{let res=eval(calcExpr);document.getElementById("calcDisplay").value=res||0;calcExpr=res?res.toString():"";}catch(e){document.getElementById("calcDisplay").value="Error";calcExpr="";}}
-function toggleAI(){aiOpen=!aiOpen;document.getElementById("aiBox").style.display=aiOpen?"flex":"none";}
-function sendAIQuery(){const input=document.getElementById("aiInput");const query=input.value.trim();if(!query)return;
-const body=document.getElementById("aiBody");const uMsg=document.createElement("div");uMsg.className="chat-msg msg-user";uMsg.innerText=query;body.appendChild(uMsg);input.value="";body.scrollTop=body.scrollHeight;
-setTimeout(()=>{const aiMsg=document.createElement("div");aiMsg.className="chat-msg msg-ai";aiMsg.innerText="Loading '"+query+"'...";body.appendChild(aiMsg);document.getElementById("wf").src="https://wikipedia.org"+encodeURIComponent(query);body.scrollTop=body.scrollHeight;},400);}
-function toggleDash(){open=!open;document.getElementById("dash").style.display=open?"flex":"none";clearInterval(loop);if(open&&auth)start();}
-function verify(){if(document.getElementById("pw").value==="S2G_250"){auth=true;document.getElementById("lock").style.display="none";document.getElementById("games").style.display="flex";start();}else{document.getElementById("pw").value="";}}
-function setG(g){clearInterval(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';document.getElementById("b-"+id).className='g-btn';});document.getElementById("w-"+g).className='win active';document.getElementById("b-"+g).className='g-btn active';start();}
-function drawOver(canvasId,ctx,w,h){over=true;clearInterval(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Canvas to Restart",w/2,h/2+20);}
-games.forEach(id=>{document.getElementById("c-"+id).addEventListener('click',()=>{if(over)start();});});
-
-// --- ENGINES ---
-let sn,sDir,sf,sc;
-function initS(){sn=[{x:7,y:7}];sDir={x:1,y:0};sc=0;sf={x:3,y:3};const ctx=document.getElementById("c-s").getContext("2d");loop=setInterval(()=>{let h={x:sn.x+sDir.x,y:sn.y+sDir.y};if(h.x<0||h.x>=15||h.y<0||h.y>=15||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);sn.unshift(h);if(h.x===sf.x&&h.y===sf.y){sc+=10;sf={x:Math.floor(Math.random()*15),y:Math.floor(Math.random()*15)};}else sn.pop();ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);ctx.fillStyle="#f44";ctx.fillRect(sf.x*20+1,sf.y*20+1,18,18);ctx.fillStyle="#4CAF50";sn.forEach(p=>ctx.fillRect(p.x*20+1,p.y*20+1,18,18));document.getElementById("s-s").innerText=sc;},130);}
-let bY,bV,pipes,fsc;
-function initF(){bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;const ctx=document.getElementById("c-fb").getContext("2d");loop=setInterval(()=>{bV+=0.4;bY+=bV;if(bY>310||bY<5)return drawOver("c-fb",ctx,320,320);if(pipes[pipes.length-1].x<180){let th=Math.floor(Math.random()*110)+30;pipes.push({x:320,t:th,b:230-th});}pipes.forEach((p,i)=>{p.x-=2;if(p.x<-40){pipes.splice(i,1);fsc++;}if(p.x<=74&&p.x+40>=56&&(bY-8<=p.t||bY+8>=320-p.b))return drawOver("c-fb",ctx,320,320);});ctx.fillStyle="#4ec0ca";ctx.fillRect(0,0,320,320);ctx.fillStyle="#73bf2e";pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,320-p.b,40,p.b);});ctx.fillStyle="#f8e71c";ctx.beginPath();ctx.arc(65,bY,9,0,Math.PI*2);ctx.fill();document.getElementById("s-fb").innerText=fsc;},1000/60);}
-let py,cy,bx,by,bdx,bdy,psc,csc;
-function initP(){py=85;cy=85;bx=200;by=120;bdx=3;bdy=2;psc=0;csc=0;const ctx=document.getElementById("c-p").getContext("2d");loop=setInterval(()=>{bx+=bdx;by+=bdy;if(by<=5||by>=235)bdy=-bdy;if(cy+35<by)cy+=2;else if(cy+35>by)cy-=2;if(bx<=25&&by>=py&&by<=py+70){bdx=-bdx;}if(bx>=375&&by>=cy&&by<=cy+70){bdx=-bdx;}if(bx<0){csc++;bx=200;bdx=3;}if(bx>400){psc++;bx=200;bdx=-3;}ctx.fillStyle="#000";ctx.fillRect(0,0,400,240);ctx.fillStyle="#fff";ctx.fillRect(15,py,10,70);ctx.fillRect(375,cy,10,70);ctx.fillRect(bx-4,by-4,8,8);document.getElementById("s-p").innerText=psc+" - "+csc;if(psc>=5||csc>=5)return drawOver("c-p",ctx,400,240);},1000/60);}
-let brX,brBx,brBy,brBdx,brBdy,bricks,brSc;
-function initB(){brX=145;brBx=180;brBy=180;brBdx=2;brBdy=-2;brSc=0;bricks=[];for(let r=0;r<3;r++)for(let c=0;c<6;c++)bricks.push({x:c*55+15,y:r*18+30,v:1});const ctx=document.getElementById("c-b").getContext("2d");loop=setInterval(()=>{brBx+=brBdx;brBy+=brBdy;if(brBx<=5||brBx>=355)brBdx=-brBdx;if(brBy<=5)brBdy=-brBdy;if(brBy>=245&&brBx>=brX&&brBx<=brX+70)brBdy=-brBdy;if(brBy>260)return drawOver("c-b",ctx,360,260);bricks.forEach(b=>{if(b.v&&brBx>=b.x&&brBx<=b.x+50&&brBy>=b.y&&brBy<=b.y+15){b.v=0;brBdy=-brBdy;brSc+=10;}});ctx.fillStyle="#000";ctx.fillRect(0,0,360,260);ctx.fillStyle="#0f0";ctx.fillRect(brX,250,70,10);ctx.fillStyle="#ff5";ctx.fillRect(brBx-3,brBy-3,6,6);ctx.fillStyle="#37f";bricks.forEach(b=>{if(b.v)ctx.fillRect(b.x,b.y,50,15);});document.getElementById("s-b").innerText=brSc;},1000/60);}
-let tttGrid;
-function initTTT(){tttGrid=Array(9).fill(0);drawTTT();document.getElementById("s-ttt").innerText="Your Turn (X)";}
-function drawTTT(){const ctx=document.getElementById("c-ttt").getContext("2d");ctx.fillStyle="#000";ctx.fillRect(0,0,240,240);ctx.strokeStyle="#444";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(80,0);ctx.lineTo(80,240);ctx.moveTo(160,0);ctx.lineTo(160,240);ctx.moveTo(0,80);ctx.lineTo(240,80);ctx.moveTo(0,160);ctx.lineTo(240,160);ctx.stroke();ctx.lineWidth=4;tttGrid.forEach((v,i)=>{let x=(i%3)*80+40,y=Math.floor(i/3)*80+40;ctx.strokeStyle=v===1?"#2196f3":"#ff9800";if(v===1){ctx.beginPath();ctx.moveTo(x-15,y-15);ctx.lineTo(x+15,y+15);ctx.moveTo(x+15,y-15);ctx.lineTo(x-15,y+15);ctx.stroke();}else if(v===2){ctx.beginPath();ctx.arc(x,y,15,0,Math.PI*2);ctx.stroke();}});}
-document.getElementById("c-ttt").addEventListener("click",e=>{if(mode!=='ttt'||!open||!auth||over)return;const r=e.target.getBoundingClientRect();let idx=Math.floor((e.clientX-r.left)/80)+Math.floor((e.clientY-r.top)/80)*3;if(tttGrid[idx]===0){tttGrid[idx]=1;drawTTT();if(checkTTT(1)){document.getElementById("s-ttt").innerText="You Win!";over=true;return;}if(tttGrid.every(v=>v!==0)){document.getElementById("s-ttt").innerText="Tie Game!";over=true;return;}setTimeout(()=>{let emp=tttGrid.map((v,i)=>v===0?i:null).filter(v=>v!==null);if(emp.length)tttGrid[emp[Math.floor(Math.random()*emp.length)]]=2;drawTTT();if(checkTTT(2)){document.getElementById("s-ttt").innerText="CPU Wins!";over=true;return;}document.getElementById("s-ttt").innerText="Your Turn (X)";},250);}});
-function checkTTT(p){const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return lines.some(l=>l.every(i=>tttGrid[i]===p));}
-let siX,siLasers,siInv,siSc,siDir;
-function initSI(){siX=145;siLasers=[];siInv=[];siSc=0;siDir=1;for(let r=0;r<2;r++)for(let c=0;c<6;c++)siInv.push({x:c*40+30,y:r*25+30,v:1});const ctx=document.getElementById("c-si").getContext("2d");loop=setInterval(()=>{let shift=false;siInv.forEach(i=>{if(i.v&&(i.x<=10||i.x>=290))shift=true;});if(shift){siDir=-siDir;siInv.forEach(i=>{if(i.v)i.y+=10;});}siInv.forEach(i=>{if(i.v)i.x+=siDir*1.2;if(i.v&&i.y>=230)return drawGameOver();});siLasers.forEach((l,li)=>{l.y-=4;if(l.y<0)siLasers.splice(li,1);siInv.forEach(i=>{if(i.v&&l.x>=i.x&&l.x<=i.x+20&&l.y>=i.y&&l.y<=i.y+15){i.v=0;siLasers.splice(li,1);siSc+=20;}});});ctx.fillStyle="#000";ctx.fillRect(0,0,320,280);ctx.fillStyle="#e91e63";siInv.forEach(i=>{if(i.v)ctx.fillRect(i.x,i.y,20,15);});ctx.fillStyle="#00ff00";ctx.fillRect(siX,260,30,10);ctx.fillStyle="#ff5; ";siLasers.forEach(l=>ctx.fillRect(l.x,l.y,2,8));document.getElementById("s-si").innerText=siSc;if(siInv.every(i=>!i.v))return drawOver("c-si",ctx,320,280);},1000/60); function drawGameOver(){drawOver("c-si",ctx,320,280);}}
-let runX,runObs,runSc,runSpd;
-function initRUN(){runX=135;runObs=[];runSc=0;runSpd=3;const ctx=document.getElementById("c-run").getContext("2d");loop=setInterval(()=>{runSc++;if(runSc%300===0)runSpd+=0.5;if(Math.random()<0.02){let lanes=[20,84,148,212];runObs.push({x:lanes[Math.floor(Math.random()*4)],y:-15,w:30,h:12});}runObs.forEach((o,oi)=>{o.y+=runSpd;if(o.y>300)runObs.splice(oi,1);if(o.y+o.h>=265&&o.y<=285&&runX+25>=o.x&&runX<=o.x+o.w)return drawOver("c-run",ctx,300,300);});ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);ctx.fillStyle="#f33";runObs.forEach(o=>ctx.fillRect(o.x,o.y,o.w,o.h));ctx.fillStyle="#0ef";ctx.fillRect(runX,265,25,20);document.getElementById("s-run").innerText=runSc;},1000/60);}
-let mX,mY;
-const mGrid=[[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,1,0,1,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,1,0,1],[1,0,0,0,0,1,0,0,0,1],[1,1,1,1,0,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,0,0,1],[1,1,1,1,1,1,1,1,1,1]];
-function initM(){mX=1;mY=1;drawM();}
-function drawM(){const ctx=document.getElementById("c-m").getContext("2d");ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);mGrid.forEach((r,y)=>r.forEach((v,x)=>{if(v===1){ctx.fillStyle="#555";ctx.fillRect(x*30,y*30,30,30);}}));ctx.fillStyle="#ff0";ctx.fillRect(8*30+5,8*30+5,20,20);ctx.fillStyle="#0f0";ctx.fillRect(mX*30+5,mY*30+5,20,20);if(mX===8&&mY===8){ctx.fillStyle="rgba(0,0,0,0.8)";ctx.fillRect(0,0,300,300);ctx.fillStyle="#0f0";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("MAZE CLEARED!",150,150);over=true;}}
-let astX,astY,astA,astArr,astSc;
+<FollowUp>
+To help tailor this setup, could you share:
+* Are you trying to **embed the game on your own custom website** or host a personal unblocked version via GitHub Pages?
+* Do you need help adjusting the **iframe dimensions or fullscreen controls**?
+</FollowUp>
