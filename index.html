@@ -1,124 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Wikipedia Research Assistant</title>
-    <style>
-        body, html { margin:0; padding:0; height:100%; overflow:hidden; font-family:sans-serif; background:#f6f6f6; }
-        .navbar { height:50px; background:#fff; border-bottom:1px solid #aaa; display:flex; align-items:center; justify-content:space-between; padding:0 20px; }
-        .secret-btn { width:10px; height:10px; background:#e0e0e0; border-radius:50%; cursor:pointer; }
-        .dashboard { display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:#111; color:#fff; flex-direction:column; align-items:center; justify-content:center; z-index:999; }
-        .lock-panel { display:flex; flex-direction:column; align-items:center; background:#222; padding:20px; border-radius:8px; }
-        .lock-panel input { padding:8px; background:#000; color:#0f0; border:1px solid #444; border-radius:4px; text-align:center; margin-bottom:10px; }
-        .game-panel { display:none; flex-direction:column; align-items:center; }
-        .menu { margin-bottom:15px; }
-        button { padding:8px 15px; margin:0 5px; background:#333; color:#fff; border:none; border-radius:4px; cursor:pointer; font-weight:bold; }
-        button.active { background:#4CAF50; }
-        .win { display:none; flex-direction:column; align-items:center; } .win.active { display:flex; }
-        canvas { background:#000; border:3px solid #444; cursor:pointer; }
-    </style>
+<meta charset="UTF-8">
+<title>Wikipedia Research Assistant</title>
+<style>
+body,html{margin:0;padding:0;height:100%;overflow:hidden;
+font-family:sans-serif;background:#f6f6f6;}
+.navbar{height:50px;background:#fff;border-bottom:1px
+solid #aaa;display:flex;align-items:center;
+justify-content:space-between;padding:0 20px;}
+.secret-btn{width:10px;height:10px;background:#e0e0e0;
+border-radius:50%;cursor:pointer;}
+.dashboard{display:none;position:absolute;top:0;left:0;
+width:100%;height:100%;background:#111;color:#fff;
+flex-direction:column;align-items:center;
+justify-content:center;z-index:999;}
+.lock-panel{display:flex;flex-direction:column;
+align-items:center;background:#222;padding:20px;
+border-radius:8px;}
+.lock-panel input{padding:8px;background:#000;color:#0f0;
+border:1px solid #444;border-radius:4px;
+text-align:center;margin-bottom:10px;}
+.game-panel{display:none;flex-direction:column;
+align-items:center;}
+.menu{margin-bottom:15px;}
+button{padding:8px 15px;margin:0 5px;background:#333;
+color:#fff;border:none;border-radius:4px;
+cursor:pointer;font-weight:bold;}
+button.active{background:#4CAF50;}
+.win{display:none;flex-direction:column;
+align-items:center;} .win.active{display:flex;}
+canvas{background:#000;border:3px solid #444;
+cursor:pointer;}
+.ai-widget{position:fixed;bottom:20px;right:20px;
+width:60px;height:60px;background:#3366cc;
+border-radius:50%;display:flex;align-items:center;
+justify-content:center;color:white;font-size:24px;
+cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);
+z-index:1000;transition:0.2s;}
+.ai-widget:hover{background:#2a52be;transform:scale(1.05);}
+.ai-box{display:none;position:fixed;bottom:90px;right:20px;
+width:300px;height:380px;background:#ffffff;
+border:1px solid #ccc;border-radius:8px;
+box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:1000;
+flex-direction:column;font-family:sans-serif;}
+.ai-header{background:#3366cc;color:white;padding:12px;
+font-weight:bold;font-size:14px;border-top-left-radius:7px;
+border-top-right-radius:7px;}
+.ai-body{flex:1;padding:10px;overflow-y:auto;
+background:#f9f9f9;font-size:13px;display:flex;
+flex-direction:column;gap:8px;}
+.chat-msg{padding:8px 12px;border-radius:6px;
+max-width:80%;word-wrap:break-word;}
+.msg-ai{background:#e2eafd;color:#202122;align-self:flex-start;}
+.msg-user{background:#3366cc;color:white;align-self:flex-end;}
+.ai-footer{display:flex;padding:10px;border-top:1px solid #eee;
+background:#fff;border-bottom-left-radius:7px;
+border-bottom-right-radius:7px;}
+.ai-footer input{flex:1;padding:6px;border:1px solid #ccc;
+border-radius:4px;outline:none;font-size:13px;}
+.ai-footer button{padding:6px 12px;background:#3366cc;
+color:white;border:none;border-radius:4px;margin-left:6px;
+cursor:pointer;font-size:13px;}
+</style>
 </head>
 <body>
-    <div class="navbar">
-        <div>🌐 Wikipedia Research Assistant</div>
-        <div class="secret-btn" onclick="toggleDash()"></div>
-    </div>
-    <iframe id="wf" src="https://wikipedia.org" style="width:100%; height:calc(100% - 50px); border:none;"></iframe>
-    
-    <div id="dash" class="dashboard">
-        <div id="lock" class="lock-panel">
-            <h3>SECURITY GATEWAY</h3>
-            <input type="password" id="pw" placeholder="ACCESS CODE" onkeydown="if(event.key==='Enter') verify()">
-            <button onclick="verify()">SUBMIT</button>
-        </div>
-        <div id="games" class="game-panel">
-            <div class="menu">
-                <button id="b-s" class="active" onclick="setG('s')">Snake</button>
-                <button id="b-f" onclick="setG('fb')">Flappy</button>
-            </div>
-            <div id="w-s" class="win active"><canvas id="c-s" width="300" height="300"></canvas><div>Score: <span id="s-s">0</span></div></div>
-            <div id="w-fb" class="win"><canvas id="c-f" width="320" height="320"></canvas><div>Score: <span id="s-f">0</span></div></div>
-            <p style="color:#666; font-size:12px; margin-top:15px;">Press ESC key or click the top-right dot to exit instantly</p>
-        </div>
-    </div>
-
-    <script>
-        let open=false, auth=false, mode='s', loop, over=false;
-        function toggleDash() {
-            open=!open; document.getElementById("dash").style.display=open?"flex":"none";
-            clearInterval(loop); 
-            if(open&&auth) start();
-        }
-        function verify() {
-            if(document.getElementById("pw").value==="S2G_250") {
-                auth=true; document.getElementById("lock").style.display="none";
-                document.getElementById("games").style.display="flex"; start();
-            } else { document.getElementById("pw").value=""; }
-        }
-        function setG(g) {
-            clearInterval(loop); mode=g; over=false;
-            document.getElementById("w-s").className=g==='s'?'win active':'win';
-            document.getElementById("w-fb").className=g==='fb'?'win active':'win';
-            document.getElementById("b-s").className=g==='s'?'active':'';
-            document.getElementById("b-f").className=g==='fb'?'active':'';
-            start();
-        }
-        function drawOver(c,ctx,w,h) {
-            over=true; clearInterval(loop); ctx.fillStyle="rgba(0,0,0,0.85)"; ctx.fillRect(0,0,w,h);
-            ctx.fillStyle="#ff3333"; ctx.font="bold 20px monospace"; ctx.textAlign="center"; ctx.fillText("GAME OVER",w/2,h/2-5);
-            ctx.fillStyle="#fff"; ctx.font="12px monospace"; ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);
-        }
-        document.getElementById("c-s").addEventListener('click', ()=>{if(over)start();});
-        document.getElementById("c-f").addEventListener('click', ()=>{if(over)start();});
-
-        // --- SNAKE ---
-        let sn,sDir,sf,sc;
-        function initS() {
-            sn=[{x:7,y:7}]; sDir={x:1,y:0}; sc=0; sf={x:3,y:3};
-            const ctx=document.getElementById("c-s").getContext("2d");
-            loop=setInterval(()=>{
-                let h={x:sn[0].x+sDir.x, y:sn[0].y+sDir.y};
-                if(h.x<0||h.x>=15||h.y<0||h.y>=15||sn.some(p=>p.x===h.x&&p.y===h.y)) return drawOver("c-s",ctx,300,300);
-                sn.unshift(h);
-                if(h.x===sf.x && h.y===sf.y) { sc+=10; sf={x:Math.floor(Math.random()*15),y:Math.floor(Math.random()*15)}; } else sn.pop();
-                ctx.fillStyle="#000"; ctx.fillRect(0,0,300,300);
-                ctx.fillStyle="#f44"; ctx.fillRect(sf.x*20+1,sf.y*20+1,18,18);
-                ctx.fillStyle="#4CAF50"; sn.forEach(p=>ctx.fillRect(p.x*20+1,p.y*20+1,18,18));
-                document.getElementById("s-s").innerText=sc;
-            },130);
-        }
-
-        // --- FLAPPY ---
-        let bY,bV,pipes,fsc;
-        function initF() {
-            bY=140; bV=0; pipes=[{x:320,t:80,b:150}]; fsc=0;
-            const ctx=document.getElementById("c-f").getContext("2d");
-            loop=setInterval(()=>{
-                bV+=0.4; bY+=bV; if(bY>310||bY<5) return drawOver("c-f",ctx,320,320);
-                if(pipes[pipes.length-1].x<180) { let th=Math.floor(Math.random()*110)+30; pipes.push({x:320,t:th,b:230-th}); }
-                pipes.forEach((p,i)=>{
-                    p.x-=2; if(p.x<-40){pipes.splice(i,1); fsc++;}
-                    if(p.x<=74&&p.x+40>=56&&(bY-8<=p.t||bY+8>=320-p.b)) return drawOver("c-f",ctx,320,320);
-                });
-                ctx.fillStyle="#4ec0ca"; ctx.fillRect(0,0,320,320);
-                ctx.fillStyle="#73bf2e"; pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t); ctx.fillRect(p.x,320-p.b,40,p.b);});
-                ctx.fillStyle="#f8e71c"; ctx.beginPath(); ctx.arc(65,bY,9,0,Math.PI*2); ctx.fill();
-                document.getElementById("s-f").innerText=fsc;
-            },1000/60);
-        }
-        function start() { over=false; if(mode==='s') initS(); else initF(); }
-
-        document.addEventListener("keydown", e=>{
-            if (e.keyCode === 27) {
-                if (open) toggleDash();
-                return;
-            }
-            if(!open||!auth||over) return;
-            if(mode==='s') {
-                if(e.keyCode===37&&sDir.x!==1) sDir={x:-1,y:0}; if(e.keyCode===38&&sDir.y!==1) sDir={x:0,y:-1};
-                if(e.keyCode===39&&sDir.x!==-1) sDir={x:1,y:0}; if(e.keyCode===40&&sDir.y!==-1) sDir={x:0,y:1};
-            } else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38)) { bV=-6.5; e.preventDefault(); }
-        });
-    </script>
+<div class="navbar">
+<div>🌐 Wikipedia Research Assistant</div>
+<div class="secret-btn" onclick="toggleDash()"></div>
+</div>
+<iframe id="wf" src="https://wikipedia.org"
+style="width:100%;height:calc(100% - 50px);
+border:none;"></iframe>
+<div class="ai-widget" onclick="toggleAI()">🤖</div>
+<div id="aiBox" class="ai-box">
+<div class="ai-header">Core Research Assistant v1.0</div>
+<div id="aiBody" class="ai-body">
+<div class="chat-msg msg-ai">Hello! Type a topic to update
+your research database entry.</div>
+</div>
+<div class="ai-footer">
+<input type="text" id="aiInput" placeholder="Ask a question..."
+onkeydown="if(event.key==='Enter') sendAIQuery()">
+<button onclick="sendAIQuery()">Ask</button>
+</div>
+</div>
+<div id="dash" class="dashboard">
+<div id="lock" class="lock-panel">
+<h3>SECURITY GATEWAY</h3>
+<input type="password" id="pw" placeholder="ACCESS CODE"
+onkeydown="if(event.key==='Enter') verify()">
+<button onclick="verify()">SUBMIT</button>
+</div>
+<div id="games" class="game-panel">
+<div class="menu">
+<button id="b-s" class="active" onclick="setG('s')">Snake</button>
+<button id="b-f" onclick="setG('fb')">Flappy</button>
+</div>
+<div id="w-s" class="win active"><canvas id="c-s"
+width="300" height="300"></canvas><div>Score:
+<span id="s-s">0</span></div></div>
+<div id="w-fb" class="win"><canvas id="c-f"
+width="320" height="320"></canvas><div>Score:
+<span id="s-f">0</span></div></div>
+<p style="color:#666;font-size:12px;margin-top:15px;">
+Press ESC key or click top-right dot to exit instantly</p>
+</div>
+</div>
+<script>
+let open=false,auth=false,mode='s',loop,over=false,aiOpen=false;
+function toggleAI(){aiOpen=!aiOpen;
+document.getElementById("aiBox").style.display=aiOpen?"flex":"none";}
+function sendAIQuery(){const input=document.getElementById("aiInput");
+const query=input.value.trim();if(!query)return;
+const body=document.getElementById("aiBody");
+const uMsg=document.createElement("div");
+uMsg.className="chat-msg msg-user";uMsg.innerText=query;
+body.appendChild(uMsg);input.value="";body.scrollTop=body.scrollHeight;
+setTimeout(()=>{const aiMsg=document.createElement("div");
+aiMsg.className="chat-msg msg-ai";
+aiMsg.innerText="Searching indexes for: '"+query+"'. Synchronizing...";
+body.appendChild(aiMsg);
+document.getElementById("wf").src="https://wikipedia.org/wiki/"
++encodeURIComponent(query);body.scrollTop=body.scrollHeight;},500);}
+function toggleDash(){open=!open;
+document.getElementById("dash").style.display=open?"flex":"none";
+clearInterval(loop);if(open&&auth)start();}
+function verify(){if(document.getElementById("pw").value==="S2G_250"){
+auth=true;document.getElementById("lock").style.display="none";
+document.getElementById("games").style.display="flex";start();
+}else{document.getElementById("pw").value="";}}
+function setG(g){clearInterval(loop);mode=g;over=false;
+document.getElementById("w-s").className=g==='s'?'win active':'win';
+document.getElementById("w-fb").className=g==='fb'?'win active':'win';
+document.getElementById("b-s").className=g==='s'?'active':'';
+document.getElementById("b-f").className=g==='fb'?'active':'';start();}
+function drawOver(c,ctx,w,h){over=true;clearInterval(loop);
+ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);
+ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";
+ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);
+ctx.fillStyle="#fff";ctx.font="12px monospace";
+ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
+document.getElementById("c-s").addEventListener('click',()=>{if(over)start();});
+document.getElementById("c-f").addEventListener('click',()=> {if(over)start();});
+let sn,sDir,sf,sc;
+function initS(){sn=[{x:7,y:7}];sDir={x:1,y:0};sc=0;sf={x:3,y:3};
+const ctx=document.getElementById("c-s").getContext("2d");
+loop=setInterval(()=>{let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
+if(h.x<0||h.x>=15||h.y<0||h.y>=15||sn.some(p=>p.x===h.x&&p.y===h.y))
+return drawOver("c-s",ctx,300,300);sn.unshift(h);
+if(h.x===sf.x&&h.y===sf.y){sc+=10;sf={x:Math.floor(Math.random()*15),
+y:Math.floor(Math.random()*15)};}else sn.pop();
+ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);ctx.fillStyle="#f44";
+ctx.fillRect(sf.x*20+1,sf.y*20+1,18,18);ctx.fillStyle="#4CAF50";
+sn.forEach(p=>ctx.fillRect(p.x*20+1,p.y*20+1,18,18));
+document.getElementById("s-s").innerText=sc;},130);}
+let bY,bV,pipes,fsc;
+function initF(){bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;
+const ctx=document.getElementById("c-f").getContext("2d");
+loop=setInterval(()=>{bV+=0.4;bY+=bV;if(bY>310||bY<5)
+return drawOver("c-f",ctx,320,320);
+if(pipes[pipes.length-1].x<180){let th=Math.floor(Math.random()*110)+30;
+pipes.push({x:320,t:th,b:230-th});}
+pipes.forEach((p,i)=>{p.x-=2;if(p.x<-40){pipes.splice(i,1);fsc++;}
+if(p.x<=74&&p.x+40>=56&&(bY-8<=p.t||bY+8>=320-p.b))
+return drawOver("c-f",ctx,320,320);});
+ctx.fillStyle="#4ec0ca";ctx.fillRect(0,0,320,320);ctx.fillStyle="#73bf2e";
+pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,320-p.b,40,p.b);});
+ctx.fillStyle="#f8e71c";ctx.beginPath();ctx.arc(65,bY,9,0,Math.PI*2);
+ctx.fill();document.getElementById("s-f").innerText=fsc;},1000/60);}
+function start(){over=false;if(mode==='s')initS();else initF();}
+document.addEventListener("keydown",e=>{if(e.keyCode===27){if(open)toggleDash();
+return;}if(!open||!auth||over)return;if(mode==='s'){
+if(e.keyCode===37&&sDir.x!==1)sDir={x:-1,y:0};
+if(e.keyCode===38&&sDir.y!==1)sDir={x:0,y:-1};
+if(e.keyCode===39&&sDir.x!==-1)sDir={x:1,y:0};
+if(e.keyCode===40&&sDir.y!==-1)sDir={x:0,y:1};}
+else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38))
+{bV=-6.5;e.preventDefault();}});
+</script>
 </body>
 </html>
