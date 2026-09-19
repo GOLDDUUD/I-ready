@@ -24,7 +24,7 @@
         .menu-btn.active { background: #4CAF50; }
         .game-container { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 340px; }
         .game-container.active { display: flex; }
-        canvas { background-color: #000; border: 3px solid #444; display: block; }
+        canvas { background-color: #000; border: 3px solid #444; display: block; cursor: pointer; }
         .score-board { font-size: 18px; margin-top: 8px; color: #aaa; font-family: monospace; }
     </style>
 </head>
@@ -92,7 +92,7 @@
     </div>
 
     <script>
-        let dashActive = false, curGame = 's', loops = {};
+        let dashActive = false, curGame = 's', loops = {}, isOver = false;
         const games = ['s','t','p','b','ttt','si'];
 
         function searchWiki() {
@@ -107,7 +107,7 @@
         }
 
         function switchGame(g) {
-            stopAll(); curGame = g;
+            stopAll(); curGame = g; isOver = false;
             games.forEach(id => {
                 document.getElementById('win-'+id).classList.remove('active');
                 document.getElementById('btn-'+id).classList.remove('active');
@@ -120,6 +120,7 @@
         function stopAll() { Object.keys(loops).forEach(k => clearInterval(loops[k])); loops = {}; }
 
         function startCurrent() {
+            isOver = false;
             if(curGame === 's') initSnake();
             else if(curGame === 't') initTetris();
             else if(curGame === 'p') initPong();
@@ -128,6 +129,25 @@
             else if(curGame === 'si') initInvaders();
         }
 
+        function drawGameOver(canvasId, textCtx) {
+            isOver = true; stopAll();
+            const canvas = document.getElementById(canvasId);
+            textCtx.fillStyle = "rgba(0,0,0,0.85)";
+            textCtx.fillRect(0, 0, canvas.width, canvas.height);
+            textCtx.fillStyle = "#ff3333";
+            textCtx.font = "bold 24px monospace";
+            textCtx.textAlign = "center";
+            textCtx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
+            textCtx.fillStyle = "#ffffff";
+            textCtx.font = "14px monospace";
+            textCtx.fillText("Click Inside Box to Restart", canvas.width / 2, canvas.height / 2 + 20);
+        }
+
+        // Global Canvas Clicks for Quick Restarting
+        games.forEach(id => {
+            document.getElementById('can-'+id).addEventListener('click', () => { if(isOver) startCurrent(); });
+        });
+
         // --- 1. SNAKE ENGINE ---
         let s_sn, s_dir, s_f, s_sc;
         function initSnake() {
@@ -135,7 +155,7 @@
             const c = document.getElementById("can-s"), ctx = c.getContext("2d");
             loops.s = setInterval(() => {
                 let h = {x: s_sn[0].x + s_dir.x, y: s_sn[0].y + s_dir.y};
-                if(h.x<0||h.x>=15||h.y<0||h.y>=15||s_sn.some(p=>p.x===h.x&&p.y===h.y)) return initSnake();
+                if(h.x<0||h.x>=15||h.y<0||h.y>=15||s_sn.some(p=>p.x===h.x&&p.y===h.y)) { return drawGameOver("can-s", ctx); }
                 s_sn.unshift(h);
                 if(h.x===s_f.x && h.y===s_f.y) { s_sc+=10; spawnFood(); } else s_sn.pop();
                 ctx.fillStyle="#000"; ctx.fillRect(0,0,300,300);
@@ -152,8 +172,8 @@
             [[1,1,1,1]],
             [[1,1,1],[0,1,0]],
             [[1,1,0],[0,1,1]],
-            [[1,1],[1,1]],
-            [[1,1,1],[1,0,0]]
+            [[0,1,1],[1,1,0]],
+            [[1,1],[1,1]]
         ];
         function initTetris() {
             t_bd = Array.from({length:15},()=>Array(10).fill(0)); t_sc = 0; newPiece();
@@ -162,8 +182,8 @@
                 if(!tCol(t_p,0,1)) t_p.y++;
                 else {
                     t_p.s.forEach((r,y)=>r.forEach((v,x)=>{if(v&&t_p.y+y>=0) t_bd[t_p.y+y][t_p.x+x]=1;}));
-                    t_bd = t_bd.filter(r=>!r.every(v=>v)); while(t_bd.length<15) { t_bd.unshift(Array(10).fill(0)); t_sc++; }
-                    newPiece(); if(tCol(t_p,0,0)) return initTetris();
+                    t_bd = t_bd.filter(r=>!r.every(v=>v)); while(t_bd.length<15) { t_bd.unshift(Array(10).fill(0)); t_sc+=10; }
+                    newPiece(); if(tCol(t_p,0,0)) { return drawGameOver("can-t", ctx); }
                 }
                 ctx.fillStyle="#000"; ctx.fillRect(0,0,200,300);
                 t_bd.forEach((r,y)=>r.forEach((v,x)=>{if(v){ctx.fillStyle="#00bcd4";ctx.fillRect(x*20,y*20,19,19);}}));
@@ -185,8 +205,8 @@
                 if(cp_y+35 < b_y) cp_y+=2.2; else if(cp_y+35 > b_y) cp_y-=2.2;
                 if(b_x<=25 && b_y>=p_y && b_y<=p_y+70) { b_dx=-b_dx; b_dx*=1.05; }
                 if(b_x>=375 && b_y>=cp_y && b_y<=cp_y+70) { b_dx=-b_dx; b_dx*=1.05; }
-                if(b_x<0) { cp_sc++; b_x=200; b_y=130; b_dx=-3; }
-                if(b_x>400) { p_sc++; b_x=200; b_y=130; b_dx=3; }
+                if(b_x<0) { cp_sc++; b_x=200; b_y=130; b_dx=-3; if(cp_sc>=5) return drawGameOver("can-p", ctx); }
+                if(b_x>400) { p_sc++; b_x=200; b_y=130; b_dx=3; if(p_sc>=5) return drawGameOver("can-p", ctx); }
                 ctx.fillStyle="#000"; ctx.fillRect(0,0,400,260);
                 ctx.fillStyle="#fff"; ctx.fillRect(15,p_y,10,70); ctx.fillRect(375,cp_y,10,70);
                 ctx.beginPath(); ctx.arc(b_x,b_y,6,0,Math.PI*2); ctx.fill();
@@ -204,7 +224,7 @@
                 br_bx+=br_bdx; br_by+=br_bdy;
                 if(br_bx<=6||br_bx>=354) br_bdx=-br_bdx; if(br_by<=6) br_bdy=-br_bdy;
                 if(br_by>=260 && br_bx>=br_x && br_bx<=br_x+70) br_bdy=-br_bdy;
-                if(br_by>280) return initBreaker();
+                if(br_by>280) { return drawGameOver("can-b", ctx); }
                 br_list.forEach(b => {
                     if(b.v && br_bx>=b.x && br_bx<=b.x+50 && br_by>=b.y && br_by<=b.y+15) { b.v=0; br_bdy=-br_bdy; br_sc+=10; }
                 });
@@ -213,7 +233,7 @@
                 ctx.fillStyle="#ff5722"; ctx.beginPath(); ctx.arc(br_bx,br_by,6,0,Math.PI*2); ctx.fill();
                 ctx.fillStyle="#3f51b5"; br_list.forEach(b=>{if(b.v) ctx.fillRect(b.x,b.y,50,15);});
                 document.getElementById("score-b").innerText = br_sc;
-                if(br_list.every(b=>!b.v)) return initBreaker();
+                if(br_list.every(b=>!b.v)) { return drawGameOver("can-b", ctx); }
             }, 1000/60);
         }
 
@@ -237,27 +257,27 @@
             });
         }
         document.getElementById("can-ttt").addEventListener("click", e => {
-            if(curGame!=='ttt'||!dashActive) return;
+            if(curGame!=='ttt'||!dashActive||isOver) return;
             const rect = e.target.getBoundingClientRect();
             let mx = e.clientX - rect.left, my = e.clientY - rect.top;
             let idx = Math.floor(mx/80) + Math.floor(my/80)*3;
             if(ttt_grid[idx]===0) {
                 ttt_grid[idx] = 1; drawTTT();
-                if(checkTTT(1)) { document.getElementById("score-ttt").innerText = "You Win!"; return; }
-                if(ttt_grid.every(v=>v!==0)) { document.getElementById("score-ttt").innerText = "Tie Game!"; return; }
+                if(checkTTT(1)) { document.getElementById("score-ttt").innerText = "You Win!"; isOver=true; return; }
+                if(ttt_grid.every(v=>v!==0)) { document.getElementById("score-ttt").innerText = "Tie Game!"; isOver=true; return; }
                 document.getElementById("score-ttt").innerText = "CPU thinking...";
                 setTimeout(() => {
                     let empty = ttt_grid.map((v,i)=>v===0?i:null).filter(v=>v!==null);
                     if(empty.length) ttt_grid[empty[Math.floor(Math.random()*empty.length)]] = 2;
                     drawTTT();
-                    if(checkTTT(2)) { document.getElementById("score-ttt").innerText = "CPU Wins!"; return; }
+                    if(checkTTT(2)) { document.getElementById("score-ttt").innerText = "CPU Wins!"; isOver=true; return; }
                     document.getElementById("score-ttt").innerText = "Your Turn (X)";
-                }, 400);
+                }, 300);
             }
         });
         function checkTTT(p) {
-            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            return lines.some(l => l.every(i => ttt_grid[i]===p));
+            const winLines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return winLines.some(l => l.every(i => ttt_grid[i]===p));
         }
 
         // --- 6. SPACE INVADERS ---
@@ -269,8 +289,8 @@
             loops.si = setInterval(() => {
                 let shift = false;
                 si_inv.forEach(i=>{ if(i.v && (i.x<=10 || i.x>=310)) shift=true; });
-                if(shift) { si_dir=-si_dir; si_inv.forEach(i=>{ if(i.v) i.y+=10; }); }
-                si_inv.forEach(i=>{ if(i.v) i.x += si_dir*1.2; if(i.v && i.y>=250) return initInvaders(); });
+                if(shift) { si_dir=-si_dir; si_inv.forEach(i=>{ if(i.v) i.y+=12; }); }
+                si_inv.forEach(i=>{ if(i.v) i.x += si_dir*1.4; if(i.v && i.y>=250) { return drawGameOver("can-si", ctx); } });
                 si_lasers.forEach((l,li)=>{
                     l.y-=4; if(l.y<0) si_lasers.splice(li,1);
                     si_inv.forEach(i=>{ if(i.v && l.x>=i.x && l.x<=i.x+25 && l.y>=i.y && l.y<=i.y+15) { i.v=0; si_lasers.splice(li,1); si_sc+=20; }});
@@ -280,13 +300,13 @@
                 ctx.fillStyle="#00ff00"; ctx.fillRect(si_x,280,30,12);
                 ctx.fillStyle="#ffeb3b"; si_lasers.forEach(l=>ctx.fillRect(l.x,l.y,3,10));
                 document.getElementById("score-si").innerText = si_sc;
-                if(si_inv.every(i=>!i.v)) return initInvaders();
+                if(si_inv.every(i=>!i.v)) { return drawGameOver("can-si", ctx); }
             }, 1000/60);
         }
 
         // Global Event Routing Matrix
         document.addEventListener("keydown", e => {
-            if(!dashActive) return;
+            if(!dashActive || isOver) return;
             if(curGame === 's') {
                 if(e.keyCode===37 && s_dir.x!==1)  { s_dir={x:-1,y:0}; }
                 if(e.keyCode===38 && s_dir.y!==1)  { s_dir={x:0,y:-1}; }
@@ -297,7 +317,7 @@
                 if(e.keyCode===39 && !tCol(t_p,1,0))  t_p.x++;
                 if(e.keyCode===40 && !tCol(t_p,0,1))  t_p.y++;
                 if(e.keyCode===38) {
-                    let r = t_p.s.map((_, i) => t_p.s.map(row => row[i]).reverse()), old=t_p.s;
+                    let r = t_p.s[0].map((_, i) => t_p.s.map(row => row[i]).reverse()), old=t_p.s;
                     t_p.s = r; if(tCol(t_p,0,0)) t_p.s = old;
                 }
             } else if(curGame === 'p') {
