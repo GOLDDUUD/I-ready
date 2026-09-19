@@ -8,7 +8,7 @@
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; background: #f6f6f6; }
         .navbar { height: 50px; background: #ffffff; border-bottom: 1px solid #a2a9b1; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
         .search-box { display: flex; gap: 5px; }
-        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
+        input[type="text"] { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 200px; }
         .nav-btn { padding: 5px 12px; background: #3366cc; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .nav-btn:hover { background: #2a52be; }
         .secret-btn { width: 10px; height: 10px; background: #e0e0e0; border-radius: 50%; cursor: pointer; transition: 0.2s; }
@@ -18,6 +18,17 @@
         
         /* Dashboard Overlay */
         .dashboard-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; color: white; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
+        
+        /* Lock Screen Panel */
+        .lock-panel { display: flex; flex-direction: column; align-items: center; background: #222; padding: 25px; border-radius: 8px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .lock-panel h3 { margin: 0 0 15px 0; font-family: monospace; color: #aaa; }
+        .lock-panel input { padding: 8px; border: 1px solid #444; background: #000; color: #0f0; font-family: monospace; border-radius: 4px; text-align: center; font-size: 16px; margin-bottom: 12px; width: 180px; }
+        .lock-panel button { padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .lock-panel button:hover { background: #45a049; }
+        .error-msg { color: #ff3333; font-size: 12px; margin-top: 8px; font-family: monospace; display: none; }
+
+        /* Game System Panel */
+        .game-panel { display: none; flex-direction: column; align-items: center; }
         .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .menu-btn { padding: 10px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: #333; color: white; transition: 0.2s; }
         .menu-btn:hover { background: #444; }
@@ -42,57 +53,42 @@
         <iframe id="wikiFrame" src="https://en.m.wikipedia.org/wiki/Main_Page"></iframe>
 
         <div id="gameDashboard" class="dashboard-overlay">
-            <div class="menu-grid">
-                <button class="menu-btn active" id="btn-s" onclick="switchGame('s')">Snake</button>
-                <button class="menu-btn" id="btn-t" onclick="switchGame('t')">Tetris</button>
-                <button class="menu-btn" id="btn-p" onclick="switchGame('p')">Pong AI</button>
-                <button class="menu-btn" id="btn-b" onclick="switchGame('b')">Breaker</button>
-                <button class="menu-btn" id="btn-ttt" onclick="switchGame('ttt')">Tic-Tac-Toe</button>
-                <button class="menu-btn" id="btn-si" onclick="switchGame('si')">Invaders</button>
+            
+            <!-- GATEWAY LOCK SCREEN -->
+            <div id="lockScreen" class="lock-panel">
+                <h3>SECURITY GATEWAY</h3>
+                <input type="password" id="passInput" placeholder="ENTER ACCESS CODE" onkeydown="if(event.key==='Enter') verifyKey()">
+                <button onclick="verifyKey()">SUBMIT</button>
+                <div id="lockError" class="error-msg">INVALID SECURITY ACCESS CODE</div>
             </div>
 
-            <!-- SNAKE -->
-            <div id="win-s" class="game-container active">
-                <canvas id="can-s" width="300" height="300"></canvas>
-                <div class="score-board">Score: <span id="score-s">0</span></div>
+            <!-- UNLOCKED GAME SYSTEM -->
+            <div id="gamePanel" class="game-panel">
+                <div class="menu-grid">
+                    <button class="menu-btn active" id="btn-s" onclick="switchGame('s')">Snake</button>
+                    <button class="menu-btn" id="btn-t" onclick="switchGame('t')">Tetris</button>
+                    <button class="menu-btn" id="btn-p" onclick="switchGame('p')">Pong AI</button>
+                    <button class="menu-btn" id="btn-b" onclick="switchGame('b')">Breaker</button>
+                    <button class="menu-btn" id="btn-ttt" onclick="switchGame('ttt')">Tic-Tac-Toe</button>
+                    <button class="menu-btn" id="btn-si" onclick="switchGame('si')">Invaders</button>
+                </div>
+
+                <!-- GAMES -->
+                <div id="win-s" class="game-container active"><canvas id="can-s" width="300" height="300"></canvas><div class="score-board">Score: <span id="score-s">0</span></div></div>
+                <div id="win-t" class="game-container"><canvas id="can-t" width="200" height="300"></canvas><div class="score-board">Lines: <span id="score-t">0</span></div></div>
+                <div id="win-p" class="game-container"><canvas id="can-p" width="400" height="260"></canvas><div class="score-board" id="score-p">Player: 0 | CPU: 0</div></div>
+                <div id="win-b" class="game-container"><canvas id="can-b" width="360" height="280"></canvas><div class="score-board">Score: <span id="score-b">0</span></div></div>
+                <div id="win-ttt" class="game-container"><canvas id="can-ttt" width="240" height="240"></canvas><div class="score-board" id="score-ttt">Your Turn (X)</div></div>
+                <div id="win-si" class="game-container"><canvas id="can-si" width="340" height="300"></canvas><div class="score-board">Score: <span id="score-si">0</span></div></div>
+                
+                <p style="color: #666; font-size: 11px; margin-top: 15px; font-family: monospace;">Click the top-right node to toggle dashboard privacy matrix.</p>
             </div>
 
-            <!-- TETRIS -->
-            <div id="win-t" class="game-container">
-                <canvas id="can-t" width="200" height="300"></canvas>
-                <div class="score-board">Lines: <span id="score-t">0</span></div>
-            </div>
-
-            <!-- PONG -->
-            <div id="win-p" class="game-container">
-                <canvas id="can-p" width="400" height="260"></canvas>
-                <div class="score-board" id="score-p">Player: 0 | CPU: 0</div>
-            </div>
-
-            <!-- BRICK BREAKER -->
-            <div id="win-b" class="game-container">
-                <canvas id="can-b" width="360" height="280"></canvas>
-                <div class="score-board">Score: <span id="score-b">0</span></div>
-            </div>
-
-            <!-- TIC-TAC-TOE -->
-            <div id="win-ttt" class="game-container">
-                <canvas id="can-ttt" width="240" height="240"></canvas>
-                <div class="score-board" id="score-ttt">Your Turn (X)</div>
-            </div>
-
-            <!-- SPACE INVADERS -->
-            <div id="win-si" class="game-container">
-                <canvas id="can-si" width="340" height="300"></canvas>
-                <div class="score-board">Score: <span id="score-si">0</span></div>
-            </div>
-
-            <p style="color: #666; font-size: 11px; margin-top: 15px; font-family: monospace;">Click the top-right node to toggle dashboard privacy matrix.</p>
         </div>
     </div>
 
     <script>
-        let dashActive = false, curGame = 's', loops = {}, isOver = false;
+        let dashActive = false, unlocked = false, curGame = 's', loops = {}, isOver = false;
         const games = ['s','t','p','b','ttt','si'];
 
         function searchWiki() {
@@ -102,8 +98,37 @@
 
         function toggleDashboard() {
             dashActive = !dashActive;
-            document.getElementById("gameDashboard").style.display = dashActive ? "flex" : "none";
-            stopAll(); if(dashActive) startCurrent();
+            const dash = document.getElementById("gameDashboard");
+            
+            if (dashActive) {
+                dash.style.display = "flex";
+                if (unlocked) {
+                    document.getElementById("lockScreen").style.display = "none";
+                    document.getElementById("gamePanel").style.display = "flex";
+                    startCurrent();
+                } else {
+                    document.getElementById("lockScreen").style.display = "flex";
+                    document.getElementById("gamePanel").style.display = "none";
+                    document.getElementById("passInput").value = "";
+                    document.getElementById("lockError").style.display = "none";
+                }
+            } else {
+                dash.style.display = "none";
+                stopAll();
+            }
+        }
+
+        function verifyKey() {
+            const val = document.getElementById("passInput").value;
+            if (val === "S2G_250") {
+                unlocked = true;
+                document.getElementById("lockScreen").style.display = "none";
+                document.getElementById("gamePanel").style.display = "flex";
+                startCurrent();
+            } else {
+                document.getElementById("lockError").style.display = "block";
+                document.getElementById("passInput").value = "";
+            }
         }
 
         function switchGame(g) {
@@ -114,7 +139,7 @@
             });
             document.getElementById('win-'+g).classList.add('active');
             document.getElementById('btn-'+g).classList.add('active');
-            if(dashActive) startCurrent();
+            if(dashActive && unlocked) startCurrent();
         }
 
         function stopAll() { Object.keys(loops).forEach(k => clearInterval(loops[k])); loops = {}; }
@@ -143,9 +168,8 @@
             textCtx.fillText("Click Inside Box to Restart", canvas.width / 2, canvas.height / 2 + 20);
         }
 
-        // Global Canvas Clicks for Quick Restarting
         games.forEach(id => {
-            document.getElementById('can-'+id).addEventListener('click', () => { if(isOver) startCurrent(); });
+            document.getElementById('can-'+id).addEventListener('click', () => { if(isOver && unlocked) startCurrent(); });
         });
 
         // --- 1. SNAKE ENGINE ---
@@ -168,13 +192,7 @@
 
         // --- 2. TETRIS ENGINE ---
         let t_bd, t_sc, t_p;
-        const t_sh = [
-            [[1,1,1,1]],
-            [[1,1,1],[0,1,0]],
-            [[1,1,0],[0,1,1]],
-            [[0,1,1],[1,1,0]],
-            [[1,1],[1,1]]
-        ];
+        const t_sh = [[[1,1,1,1]], [[1,1,1],[0,1,0]], [[1,1,0],[0,1,1]], [[0,1,1],[1,1,0]], [[1,1],[1,1]]];
         function initTetris() {
             t_bd = Array.from({length:15},()=>Array(10).fill(0)); t_sc = 0; newPiece();
             const c = document.getElementById("can-t"), ctx = c.getContext("2d");
@@ -239,10 +257,7 @@
 
         // --- 5. TIC-TAC-TOE ---
         let ttt_grid;
-        function initTTT() {
-            ttt_grid = Array(9).fill(0); drawTTT();
-            document.getElementById("score-ttt").innerText = "Your Turn (X)";
-        }
+        function initTTT() { ttt_grid = Array(9).fill(0); drawTTT(); document.getElementById("score-ttt").innerText = "Your Turn (X)"; }
         function drawTTT() {
             const c = document.getElementById("can-ttt"), ctx = c.getContext("2d");
             ctx.fillStyle="#000"; ctx.fillRect(0,0,240,240);
@@ -257,7 +272,7 @@
             });
         }
         document.getElementById("can-ttt").addEventListener("click", e => {
-            if(curGame!=='ttt'||!dashActive||isOver) return;
+            if(curGame!=='ttt'||!dashActive||!unlocked||isOver) return;
             const rect = e.target.getBoundingClientRect();
             let mx = e.clientX - rect.left, my = e.clientY - rect.top;
             let idx = Math.floor(mx/80) + Math.floor(my/80)*3;
@@ -276,8 +291,8 @@
             }
         });
         function checkTTT(p) {
-            const winLines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            return winLines.some(l => l.every(i => ttt_grid[i]===p));
+            const wl = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return wl.some(l => l.every(i => ttt_grid[i]===p));
         }
 
         // --- 6. SPACE INVADERS ---
@@ -304,9 +319,9 @@
             }, 1000/60);
         }
 
-        // Global Event Routing Matrix
+        // Event Handling Matrix
         document.addEventListener("keydown", e => {
-            if(!dashActive || isOver) return;
+            if(!dashActive || !unlocked || isOver) return;
             if(curGame === 's') {
                 if(e.keyCode===37 && s_dir.x!==1)  { s_dir={x:-1,y:0}; }
                 if(e.keyCode===38 && s_dir.y!==1)  { s_dir={x:0,y:-1}; }
