@@ -130,8 +130,8 @@ games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListene
 function start(){
 over=false;
 if(mode==='rbx'){
-  // Fixed: Routing through a verified active, school-unblocked player node inside the iframe box
-  document.getElementById("f-rbx").src="https://mathplayground.xyz";
+  // Direct integration channel loading cloud client node into the frame grid panel
+  document.getElementById("f-rbx").src="https://github.io";
 }else if(mode==='yt'){document.getElementById("f-yt").src="https://youtube.com";}
 else if(mode==='bb')initBB();else if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();
 }
@@ -149,7 +149,7 @@ const ctx=document.getElementById("c-s").getContext("2d");
 function sStep(timestamp){
 if(!open||!auth||over||mode!=='s')return;loop=requestAnimationFrame(sStep);let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
 if(moveTimer>=snakeSpeedBase){moveTimer=0;sDir={...nextDir};
-let h={x:sn.x+sDir.x,y:sn.y+sDir.y};
+let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
 if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);
 sn.unshift(h);if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;snakeSpeedBase=Math.max(60,130-(sc/2));spawnSf();}else{sn.pop();}}
 ctx.fillStyle="#111";ctx.fillRect(0,0,300,300);ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(sf.x+10,sf.y+10,8,0,Math.PI*2);ctx.fill();
@@ -160,9 +160,9 @@ function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.ra
 </script>
 <script>
 let bbBoard,bbScore,bbShapes,bbDragIdx,bbDragX,bbDragY,bbIsDragging,bbOffsetX,bbOffsetY;
-const bbShapeTypes=[{s:[,],w:2,h:2,c:"#e11d48"},{s:[,,],w:1,h:3,c:"#ea580c"},{s:[],w:3,h:1,c:"#ca8a04"},{s:[,],w:2,h:2,c:"#16a34a"},{s:[,],w:2,h:2,c:"#2563eb"}];
+const bbShapeTypes=[{s:[[1,1],[1,1]],w:2,h:2,c:"#e11d48"},{s:[[1],[1],[1]],w:1,h:3,c:"#ea580c"},{s:[[1,1,1]],w:3,h:1,c:"#ca8a04"},{s:[[1,0],[1,1]],w:2,h:2,c:"#16a34a"},{s:[[0,1],[1,1]],w:2,h:2,c:"#2563eb"}];
 function initBB(){bbBoard=Array.from({length:8},()=>Array(8).fill(0));bbScore=0;bbDragIdx=-1;bbIsDragging=false;spawnShapesBB();const c=document.getElementById("c-bb"),ctx=c.getContext("2d");
-function bbStep(){if(!open||!auth||over||mode!=='bb')return;loop=requestAnimationFrame(bbStep);ctx.fillStyle="#15151e";ctx.fillRect(0,0,340,460);ctx.fillStyle="#1f1f2e";ctx.fillRect(20,20,288,288);ctx.strokeStyle="#2e2e42";ctx.lineWidth=2;for(let i=0;i<=8;i++){ctx.beginPath();ctx.moveTo(20+i*36,20);ctx.lineTo(20+i*36,308);ctx.stroke();ctx.beginPath();ctx.moveTo(20,20+i*36);ctx.lineTo(308,20+i*36);ctx.stroke();}for(let r=0;r<8;r++)for(let col=0;col<8;col++){if(bbBoard[r][col]!==0){ctx.fillStyle=bbBoard[r][col];ctx.fillRect(22+col*36,22+r*36,32,32);}}bbShapes.forEach((s,si)=>{if(s.used||si===bbDragIdx)return;ctx.fillStyle=s.shape.c;s.shape.s.forEach((row,r)=>row.forEach((v,col)=>{if(v)ctx.fillRect(si*105+col*14+25,355+r*14,11,11);}));});if(bbIsDragging&&bbDragIdx!==-1){ctx.fillStyle=bbShapes[bbDragIdx].shape.c;bbShapes[bbDragIdx].shape.s.forEach((row,r)=>row.forEach((v,col)=>{if(v)ctx.fillRect(bbDragX+col*36,bbDragY+r*36,32,32);}));}document.getElementById("s-bb").innerText=bbScore;}loop=requestAnimationFrame(bbStep);}
+function bbStep(){if(!open||!auth||over||mode!=='bb')return;loop=requestAnimationFrame(bbStep);ctx.fillStyle="#15151e";ctx.fillRect(0,0,340,460);ctx.fillStyle="#1f1f2e";ctx.fillRect(20,20,288,288);ctx.strokeStyle="#2e2e42";ctx.lineWidth=2;for(let i=0;i<=8;i++){ctx.beginPath();ctx.moveTo(20+i*36,20);ctx.lineTo(20+i*36,308);ctx.stroke();ctx.beginPath();ctx.moveTo(20,20+i*36);ctx.lineTo(308,20+i*36);ctx.stroke();}for(let r=0;r<8;r++)for(let col=0;col<8;col++){if(bbBoard[r][col]!==0){ctx.fillStyle=bbBoard[r][col];ctx.fillRect(22+col*36,22+r*36,32,32);}}bbShapes.forEach((s,si)=>{if(s.used||si===bbDragIdx)return;ctx.fillStyle=s.shape.c;s.shape.s.forEach((row,r) => row.forEach((v,col)=>{if(v)ctx.fillRect(si*105+col*14+25,355+r*14,11,11);}));});if(bbIsDragging&&bbDragIdx!==-1){ctx.fillStyle=bbShapes[bbDragIdx].shape.c;bbShapes[bbDragIdx].shape.s.forEach((row,r)=>row.forEach((v,col)=>{if(v)ctx.fillRect(bbDragX+col*36,bbDragY+r*36,32,32);}));}document.getElementById("s-bb").innerText=bbScore;}loop=requestAnimationFrame(bbStep);}
 function spawnShapesBB(){bbShapes=[];for(let i=0;i<3;i++){bbShapes.push({shape:bbShapeTypes[Math.floor(Math.random()*bbShapeTypes.length)],used:false});}}
 function checkBBClears(){let cRows=[],cCols=[];for(let r=0;r<8;r++){if(bbBoard[r].every(v=>v!==0))cRows.push(r);}for(let col=0;col<8;col++){let full=true;for(let r=0;r<8;r++){if(bbBoard[r][col]===0)full=false;}if(full)cCols.push(col);}cRows.forEach(r=>bbBoard[r].fill(0));cCols.forEach(col=>{for(let r=0;r<8;r++)bbBoard[r][col]=0;});bbScore+=(cRows.length+cCols.length)*20;}
 const bbc=document.getElementById("c-bb");
@@ -172,7 +172,7 @@ document.addEventListener("mouseup",e=>{if(!bbIsDragging||mode!=='bb')return;let
 
 document.addEventListener("keydown",e=>{
 if(e.keyCode===27){if(open)toggleDashboard();return;}if(!open||!auth||over)return;
-if(mode==='sw'&&(e.keyCode===32||e.keyCode===38)){isHolding=true;e.preventDefault();}
+if(mode=='sw'&&(e.keyCode===32||e.keyCode===38)){isHolding=true;e.preventDefault();}
 if(mode==='s'){
 if(e.keyCode===37&&sDir.x===0)nextDir={x:-20,y:0};if(e.keyCode===38&&sDir.y===0)nextDir={x:0,y:-20};if(e.keyCode===39&&sDir.x===0)nextDir={x:20,y:0};if(e.keyCode===40&&sDir.y===0)nextDir={x:0,y:20};
 }else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38)){bV=-6.5;e.preventDefault();}
