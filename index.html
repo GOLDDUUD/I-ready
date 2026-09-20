@@ -103,7 +103,7 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button id="b-s" onclick="setG('s')">Arcade Snake</button>
 <button id="b-fb" onclick="setG('fb')">Flappy Bird</button>
 </div>
-<div id="w-rbx" class="win active"><iframe id="f-rbx" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Streaming unblocked cloud simulation node frame inside dashboard partition...</div></div>
+<div id="w-rbx" class="win active"><iframe id="f-rbx" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Streaming local cloud game instance completely unblocked inside web node...</div></div>
 <div id="w-yt" class="win"><iframe id="f-yt" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Connecting to unblocked media node...</div></div>
 <div id="w-bb" class="win"><canvas id="c-bb" width="340" height="460"></canvas><div style="font-family:monospace;margin-top:5px;color:#aaa;font-size:16px;">Score: <span id="s-bb">0</span> | Drag and Drop blocks into the grid!</div></div>
 <div id="w-sw" class="win"><canvas id="c-sw" width="400" height="300"></canvas><div style="font-family:monospace;margin-top:5px;font-size:16px;color:#aaa;">Distance: <span id="s-sw">0</span>m</div></div>
@@ -130,8 +130,19 @@ games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListene
 function start(){
 over=false;
 if(mode==='rbx'){
-  // Deployed high-speed unblocked cloud mirror partition direct to local website frame box
-  document.getElementById("f-rbx").src="https://amazonaws.com";
+  let rbxFrame = document.getElementById("f-rbx");
+  let frameDoc = rbxFrame.contentWindow || rbxFrame.contentDocument.document || rbxFrame.contentDocument;
+  frameDoc.document.open();
+  frameDoc.document.write(`
+    <body style="margin:0;background:#000;color:#0f0;font-family:monospace;padding:20px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;box-sizing:border-box;">
+    <div style="text-align:center;border:2px solid #0f0;padding:20px;background:#111;box-shadow:0 0 15px rgba(0,255,0,0.3);max-width:90%;">
+      <h3 style="margin:0 0 10px 0;letter-spacing:1px;font-size:14px;">🛸 GOLDDUUD ARCADE CLOUD TERMINAL</h3>
+      <p style="color:#888;font-size:11px;margin:0 0 20px 0;line-height:1.4;">External cloud connection frame blocks detected. Initiating standalone sandbox window matrix to bypass firewalls...</p>
+      <button onclick="window.parent.open('https://nowgg.nl', '_blank', 'noopener,noreferrer')" style="background:#0f0;color:#000;border:none;padding:10px 20px;font-weight:bold;cursor:pointer;border-radius:4px;font-family:monospace;box-shadow:0 0 8px #0f0;">LAUNCH UNBLOCKED CLIENT</button>
+    </div>
+    </body>
+  `);
+  frameDoc.document.close();
 }else if(mode==='yt'){document.getElementById("f-yt").src="https://youtube.com";}
 else if(mode==='bb')initBB();else if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();
 }
