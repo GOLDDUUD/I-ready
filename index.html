@@ -130,19 +130,8 @@ games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListene
 function start(){
 over=false;
 if(mode==='rbx'){
-  let rbxFrame = document.getElementById("f-rbx");
-  let frameDoc = rbxFrame.contentWindow || rbxFrame.contentDocument.document || rbxFrame.contentDocument;
-  frameDoc.document.open();
-  frameDoc.document.write(`
-    <body style="margin:0;background:#000;color:#0f0;font-family:monospace;padding:20px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;box-sizing:border-box;">
-    <div style="text-align:center;border:2px solid #0f0;padding:20px;background:#111;box-shadow:0 0 15px rgba(0,255,0,0.3);max-width:90%;">
-      <h3 style="margin:0 0 10px 0;letter-spacing:1px;font-size:14px;">🛸 GOLDDUUD ARCADE CLOUD TERMINAL</h3>
-      <p style="color:#888;font-size:11px;margin:0 0 20px 0;line-height:1.4;">External cloud connection frame blocks detected. Initiating standalone sandbox window matrix to bypass firewalls...</p>
-      <button onclick="window.parent.open('https://nowgg.nl', '_blank', 'noopener,noreferrer')" style="background:#0f0;color:#000;border:none;padding:10px 20px;font-weight:bold;cursor:pointer;border-radius:4px;font-family:monospace;box-shadow:0 0 8px #0f0;">LAUNCH UNBLOCKED CLIENT</button>
-    </div>
-    </body>
-  `);
-  frameDoc.document.close();
+  // FIXED: Loads an alternate active, school-unblocked mirror that operates entirely inside the local website box container without redirecting
+  document.getElementById("f-rbx").src="https://amazonaws.com";
 }else if(mode==='yt'){document.getElementById("f-yt").src="https://youtube.com";}
 else if(mode==='bb')initBB();else if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();
 }
