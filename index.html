@@ -1,100 +1,143 @@
-// Dark / light mode
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameZone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 
-const themeButton = document.getElementById("themeButton");
+<body>
 
-themeButton.onclick = () => {
-  document.body.classList.toggle("light");
+<header>
+  <div class="logo">🎮 GameZone</div>
 
-  themeButton.textContent =
-    document.body.classList.contains("light")
-      ? "☀️"
-      : "🌙";
-};
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#games">Games</a>
+    <a href="#roblox">Roblox</a>
+  </nav>
 
+  <button id="themeButton">🌙</button>
+</header>
 
-// Game search
+<main>
 
-const search = document.getElementById("search");
+<section class="hero" id="home">
+  <h1>Welcome to GameZone</h1>
+  <p>Play browser games and discover Roblox experiences.</p>
 
-search.addEventListener("input", () => {
+  <input
+    id="search"
+    type="text"
+    placeholder="🔎 Search games..."
+  >
+</section>
 
-  const text = search.value.toLowerCase();
+<section id="games">
+  <h2>🕹️ Browser Games</h2>
 
-  document.querySelectorAll(".card").forEach(card => {
+  <div class="grid">
 
-    const name = card.innerText.toLowerCase();
+    <div class="card">
+      <div class="emoji">🐍</div>
+      <h3>Snake</h3>
+      <p>Eat the food and grow!</p>
+      <button onclick="playSnake()">Play</button>
+    </div>
 
-    card.style.display =
-      name.includes(text) ? "" : "none";
+    <div class="card">
+      <div class="emoji">❌</div>
+      <h3>Tic-Tac-Toe</h3>
+      <p>Challenge the computer.</p>
+      <button onclick="playTicTacToe()">Play</button>
+    </div>
 
-  });
+    <div class="card">
+      <div class="emoji">🧠</div>
+      <h3>Memory</h3>
+      <p>Match the cards.</p>
+      <button onclick="playMemory()">Play</button>
+    </div>
 
-});
+    <div class="card">
+      <div class="emoji">🏓</div>
+      <h3>Pong</h3>
+      <p>Classic arcade action.</p>
+      <button onclick="playPong()">Play</button>
+    </div>
 
+  </div>
+</section>
 
-// Simple AI recommendation system
+<section id="roblox">
+  <h2>🟦 Roblox</h2>
 
-function aiRecommend() {
+  <div class="grid">
 
-  const input =
-    document.getElementById("aiInput")
-      .value
-      .toLowerCase();
+    <div class="card game-card">
+      <div class="emoji">🏙️</div>
+      <h3>Brookhaven</h3>
+      <p>Roleplay and explore.</p>
+      <a
+        href="https://www.roblox.com/games/"
+        target="_blank"
+        rel="noopener"
+      >
+        Open Roblox
+      </a>
+    </div>
 
-  const result =
-    document.getElementById("aiResult");
+    <div class="card game-card">
+      <div class="emoji">⚔️</div>
+      <h3>Adventure</h3>
+      <p>Explore Roblox adventures.</p>
+      <a
+        href="https://www.roblox.com/games/"
+        target="_blank"
+        rel="noopener"
+      >
+        Open Roblox
+      </a>
+    </div>
 
-  if (input.includes("relax") ||
-      input.includes("calm")) {
+    <div class="card game-card">
+      <div class="emoji">🏎️</div>
+      <h3>Racing</h3>
+      <p>Find racing experiences.</p>
+      <a
+        href="https://www.roblox.com/games/"
+        target="_blank"
+        rel="noopener"
+      >
+        Open Roblox
+      </a>
+    </div>
 
-    result.textContent =
-      "🤖 Try Memory — it's a calm puzzle game.";
+  </div>
+</section>
 
-  } else if (
-    input.includes("action") ||
-    input.includes("fast")
-  ) {
+<section class="ai-box">
+  <h2>🤖 AI Game Finder</h2>
+  <p>Tell the AI what you feel like playing.</p>
 
-    result.textContent =
-      "🤖 Try Pong — fast arcade gameplay!";
+  <input
+    id="aiInput"
+    placeholder="Example: I want something relaxing"
+  >
 
-  } else if (
-    input.includes("classic") ||
-    input.includes("old")
-  ) {
+  <button onclick="aiRecommend()">Ask AI</button>
 
-    result.textContent =
-      "🤖 Try Snake — a classic arcade game.";
+  <div id="aiResult"></div>
+</section>
 
-  } else if (
-    input.includes("roblox")
-  ) {
+</main>
 
-    result.textContent =
-      "🤖 Check the Roblox section for Roblox experiences.";
+<footer>
+  <p>GameZone • GitHub Pages</p>
+</footer>
 
-  } else {
+<script src="script.js"></script>
 
-    result.textContent =
-      "🤖 I recommend trying Snake or Tic-Tac-Toe!";
-  }
-}
-
-
-// Placeholder game launchers
-
-function playSnake() {
-  alert("Snake game coming next!");
-}
-
-function playTicTacToe() {
-  alert("Tic-Tac-Toe game coming next!");
-}
-
-function playMemory() {
-  alert("Memory game coming next!");
-}
-
-function playPong() {
-  alert("Pong game coming next!");
-}
+</body>
+</html>
