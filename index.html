@@ -1,18 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOLDDUUD's Arcade v4</title> <!-- A discreet title helps avoid suspicion -->
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        iframe { width: 100%; height: 100%; border: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard Simulator</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+    }
+
+    .login, .dashboard {
+      max-width: 500px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px #0002;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      box-sizing: border-box;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #222;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status {
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      background: #eee;
+    }
+
+    .admin {
+      background: #dff5df;
+    }
+
+    .student {
+      background: #e5e9ff;
+    }
+  </style>
 </head>
+
 <body>
 
-    <!-- Replace the src URL with the unblocked game link or web proxy link you want to embed -->
-    <iframe src="https://educational-playground.global.ssl.fastly.net"></iframe>
+  <div class="login" id="loginBox">
+    <h1>Admin Simulator</h1>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Sign In</button>
+
+    <p id="error"></p>
+  </div>
+
+  <div class="dashboard hidden" id="dashboard">
+
+    <h1>Dashboard</h1>
+
+    <div id="status" class="status"></div>
+
+    <h3>Available Actions</h3>
+
+    <button onclick="viewGrades()">View Grades</button>
+    <button onclick="manageUsers()">Manage Users</button>
+    <button onclick="adminOnly()">Admin Settings</button>
+    <button onclick="logout()">Log Out</button>
+
+    <p id="result"></p>
+  </div>
+
+<script>
+
+const users = {
+  admin: {
+    password: "admin123",
+    role: "administrator"
+  },
+
+  student: {
+    password: "student123",
+    role: "student"
+  }
+};
+
+let currentUser = null;
+
+function login() {
+
+  const username =
+    document.getElementById("username").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  if (
+    users[username] &&
+    users[username].password === password
+  ) {
+
+    currentUser = username;
+
+    document.getElementById("loginBox")
+      .classList.add("hidden");
+
+    document.getElementById("dashboard")
+      .classList.remove("hidden");
+
+    updateDashboard();
+
+  } else {
+
+    document.getElementById("error").textContent =
+      "Incorrect username or password.";
+  }
+}
+
+function updateDashboard() {
+
+  const role = users[currentUser].role;
+
+  const status =
+    document.getElementById("status");
+
+  status.textContent =
+    "Logged in as: " + currentUser +
+    " (" + role + ")";
+
+  status.className =
+    "status " +
+    (role === "administrator" ? "admin" : "student");
+}
+
+function viewGrades() {
+
+  document.getElementById("result").textContent =
+    "Grades page opened.";
+}
+
+function manageUsers() {
+
+  if (users[currentUser].role !== "administrator") {
+
+    document.getElementById("result").textContent =
+      "Access denied: administrator permission required.";
+
+    return;
+  }
+
+  document.getElementById("result").textContent =
+    "User management opened.";
+}
+
+function adminOnly() {
+
+  if (users[currentUser].role !== "administrator") {
+
+    document.getElementById("result").textContent =
+      "Access denied: administrator permission required.";
+
+    return;
+  }
+
+  document.getElementById("result").textContent =
+    "Admin settings opened.";
+}
+
+function logout() {
+
+  currentUser = null;
+
+  document.getElementById("dashboard")
+    .classList.add("hidden");
+
+  document.getElementById("loginBox")
+    .classList.remove("hidden");
+
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+}
+
+</script>
 
 </body>
 </html>
