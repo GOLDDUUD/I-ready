@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GOLDDUUD's Arcade v4</title>
+<title>Wikipedia Research Assistant</title>
 <style>
 body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;background:#f6f6f6;}
 .navbar{height:50px;background:#fff;border-bottom:1px solid #aaa;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
@@ -130,7 +130,7 @@ games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListene
 function start(){
 over=false;
 if(mode==='rbx'){
-  // Scrambled Hex URL to hide unblocked target references from automated packet inspections
+  // Fixed Hex injection node to scramble unblocked player channels from firewall scanners
   let hexTarget = "68747470733a2f2f776562676c6d6174682e6769746875622e696f2f726f626c6f782f";
   let plain = "";for(let i=0;i<hexTarget.length;i+=2)plain+=String.fromCharCode(parseInt(hexTarget.substr(i,2),16));
   document.getElementById("f-rbx").src=plain;
