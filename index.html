@@ -91,21 +91,19 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 </div>
 <div id="games" class="game-panel">
 <div class="menu">
-<button id="b-s" class="active" onclick="setG('s')">Arcade Snake</button>
+<button id="b-sw" class="active" onclick="setG('sw')">Space Wave</button>
+<button id="b-s" onclick="setG('s')">Arcade Snake</button>
 <button id="b-fb" onclick="setG('fb')">Flappy Bird</button>
-<button id="b-ttt" onclick="setG('ttt')">TicTacToe</button>
-<button id="b-m" onclick="setG('m')">Infinite Maze</button>
 </div>
-<div id="w-s" class="win active"><canvas id="c-s" width="300" height="300"></canvas><div>Score: <span id="s-s">0</span></div></div>
-<div id="w-fb" class="win"><canvas id="c-fb" width="320" height="320"></canvas><div>Score: <span id="s-f">0</span></div></div>
-<div id="w-ttt" class="win"><canvas id="c-ttt" width="240" height="240"></canvas><div id="s-ttt" style="font-family:monospace;color:#aaa;margin-top:5px;">Your Turn</div></div>
-<div id="w-m" class="win"><canvas id="c-m" width="300" height="300"></canvas><div id="s-m" style="font-family:monospace;color:#aaa;margin-top:5px;">Level: 1</div></div>
-<p style="color:#666;font-size:12px;margin-top:15px;">Press ESC key or click top-right dot to exit instantly</p>
+<div id="w-sw" class="win active"><canvas id="c-sw" width="400" height="300"></canvas><div style="font-family:monospace;margin-top:5px;font-size:16px;color:#aaa;">Distance: <span id="s-sw">0</span>m</div></div>
+<div id="w-s" class="win"><canvas id="c-s" width="300" height="300"></canvas><div style="font-family:monospace;margin-top:5px;">Score: <span id="s-s">0</span></div></div>
+<div id="w-fb" class="win"><canvas id="c-fb" width="320" height="320"></canvas><div style="font-family:monospace;margin-top:5px;">Score: <span id="s-f">0</span></div></div>
+<p style="color:#666;font-size:12px;margin-top:10px;">Press ESC key or click top-right dot to exit instantly</p>
 </div>
 </div>
 <script>
-let open=false,auth=false,mode='s',loop,over=false,aiOpen=false,calcOpen=false,calcExpr="";
-const games=['s','fb','ttt','m'];
+let open=false,auth=false,mode='sw',loop,over=false,aiOpen=false,calcOpen=false,calcExpr="",isHolding=false;
+const games=['sw','s','fb'];
 function toggleCalc(){calcOpen=!calcOpen;document.getElementById("calcBox").style.display=calcOpen?"block":"none";}
 function pressCalc(v){calcExpr+=v;document.getElementById("calcDisplay").value=calcExpr;}
 function clearCalc(){calcExpr="";document.getElementById("calcDisplay").value="0";}
@@ -114,34 +112,63 @@ function toggleAI(){aiOpen=!aiOpen;document.getElementById("aiBox").style.displa
 function sendAIQuery(){const input=document.getElementById("aiInput");const query=input.value.trim();if(!query)return;const body=document.getElementById("aiBody");const uMsg=document.createElement("div");uMsg.className="chat-msg msg-user";uMsg.innerText=query;body.appendChild(uMsg);input.value="";body.scrollTop=body.scrollHeight;setTimeout(()=>{const aiMsg=document.createElement("div");aiMsg.className="chat-msg msg-ai";aiMsg.innerText="Searching indexes...";body.appendChild(aiMsg);document.getElementById("wf").src="https://wikipedia.org"+encodeURIComponent(query);body.scrollTop=body.scrollHeight;},400);}
 function toggleDashboard(){open=!open;document.getElementById("dash").style.display=open?"flex":"none";cancelAnimationFrame(loop);if(open&&auth)start();}
 function verify(){if(document.getElementById("pw").value==="S2G_250"){auth=true;document.getElementById("lock").style.display="none";document.getElementById("games").style.display="flex";start();}else{document.getElementById("pw").value="";}}
-function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';});document.getElementById("w-"+g).className='win active';document.getElementById("b-s").className=g==='s'?'active':'';document.getElementById("b-fb").className=g==='fb'?'active':'';document.getElementById("b-ttt").className=g==='ttt'?'active':'';document.getElementById("b-m").className=g==='m'?'active':'';start();}
+function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';});document.getElementById("w-"+g).className='win active';document.getElementById("b-sw").className=g==='sw'?'active':'';document.getElementById("b-s").className=g==='s'?'active':'';document.getElementById("b-fb").className=g==='fb'?'active':'';start();}
 function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
-document.getElementById("c-s").addEventListener('click',()=>{if(over)start();});document.getElementById("c-fb").addEventListener('click',()=>{if(over)start();});document.getElementById("c-ttt").addEventListener('click',()=>{if(over)start();});document.getElementById("c-m").addEventListener('click',()=>{if(over)start();});
+games.forEach(id=>{document.getElementById("c-"+id).addEventListener('click',()=>{if(over)start();});});
 
-// --- FULLY REDESIGNED & FIXED ARCADE SNAKE ---
+// --- NEW 60FPS SPACE WAVE GAME ENGINE ---
+let swY,swV,swDist,swWalls;
+function initSW(){
+swY=150;swV=2.5;swDist=0;swWalls=[];
+const ctx=document.getElementById("c-sw").getContext("2d");
+swWalls.push({x:400,t:0,b:60,w:50});
+function swStep(){
+if(!open||!auth||over||mode!=='sw')return;
+loop=requestAnimationFrame(swStep);
+swDist++;
+if(isHolding){swY-=swV;}else{swY+=swV;}
+if(swY<10||swY>290)return drawOver("c-sw",ctx,400,300);
+if(swWalls[swWalls.length-1].x<280){
+let lastW=swWalls[swWalls.length-1];
+let topHeight=Math.floor(Math.random()*120)+20;
+let botHeight=Math.floor(Math.random()*120)+20;
+swWalls.push({x:400,t:0,b:topHeight,w:40});
+swWalls.push({x:400,t:300-botHeight,b:300,w:40});
+}
+swWalls.forEach((w,i)=>{
+w.x-=3;if(w.x<-50)swWalls.splice(i,1);
+if(w.x<=120&&w.x+w.w>=100){
+if(swY-6<=w.b&&swY+6>=w.t)return drawOver("c-sw",ctx,400,300);
+}
+});
+ctx.fillStyle="#0a0a1a";ctx.fillRect(0,0,400,300);
+ctx.fillStyle="#00ffff";swWalls.forEach(w=>{ctx.fillRect(w.x,w.t,w.w,w.b-w.t);});
+ctx.fillStyle="#ff00ff";ctx.beginPath();ctx.arc(110,swY,6,0,Math.PI*2);ctx.fill();
+document.getElementById("s-sw").innerText=Math.floor(swDist/10);
+}loop=requestAnimationFrame(swStep);
+}
+
+// --- FIXED ARCADE SNAKE CODE ---
 let sn,sDir,nextDir,sf,sc,lastTime,moveTimer,snakeSpeedBase;
 function initS(){
-sn=[{x:140,y:140},{x:120,y:140},{x:100,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;snakeSpeedBase=130;
+sn=[{x:140,y:140},{x:120,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;snakeSpeedBase=130;
 const ctx=document.getElementById("c-s").getContext("2d");
 function sStep(timestamp){
 if(!open||!auth||over||mode!=='s')return;
 loop=requestAnimationFrame(sStep);
 let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
-if(moveTimer>=snakeSpeedBase){
-moveTimer=0;sDir={...nextDir};
-let head=sn[0];
-let h={x:head.x+sDir.x,y:head.y+sDir.y};
+if(moveTimer>=snakeSpeedBase){moveTimer=0;sDir={...nextDir};
+let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
 if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);
-sn.unshift(h);
-if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;snakeSpeedBase=Math.max(60,130-(sc/2));spawnSf();}else{sn.pop();}}
-ctx.fillStyle="#111";ctx.fillRect(0,0,300,300);
-ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(sf.x+10,sf.y+10,8,0,Math.PI*2);ctx.fill();
+sn.unshift(h);if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;snakeSpeedBase=Math.max(60,130-(sc/2));spawnSf();}else{sn.pop();}}
+ctx.fillStyle="#111";ctx.fillRect(0,0,300,300);ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(sf.x+10,sf.y+10,8,0,Math.PI*2);ctx.fill();
 sn.forEach((p,i)=>{ctx.fillStyle=i===0?"#2e7d32":"#4caf50";ctx.fillRect(p.x+1,p.y+1,18,18);});
 document.getElementById("s-s").innerText=sc;
 }loop=requestAnimationFrame(sStep);
 }
 function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.random()*14)*20+10};}
 
+// --- FLAPPY BIRD CODE ---
 let bY,bV,pipes,fsc;
 function initF(){
 bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;const ctx=document.getElementById("c-fb").getContext("2d");
@@ -150,53 +177,17 @@ pipes.forEach((p,i)=>{p.x-=2;if(p.x<-40){pipes.splice(i,1);fsc++;}if(p.x<=74&&p.
 ctx.fillStyle="#4ec0ca";ctx.fillRect(0,0,320,320);ctx.fillStyle="#73bf2e";pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,320-p.b,40,p.b);});ctx.fillStyle="#f8e71c";ctx.beginPath();ctx.arc(65,bY,9,0,Math.PI*2);ctx.fill();document.getElementById("s-f").innerText=fsc;}loop=requestAnimationFrame(fStep);
 }
 
-let tttGrid;
-function initTTT(){tttGrid=Array(9).fill(0);drawTTT();document.getElementById("s-ttt").innerText="Your Turn (X)";}
-function drawTTT(){const ctx=document.getElementById("c-ttt").getContext("2d");ctx.fillStyle="#000";ctx.fillRect(0,0,240,240);ctx.strokeStyle="#444";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(80,0);ctx.lineTo(80,240);ctx.moveTo(160,0);ctx.lineTo(160,240);ctx.moveTo(0,80);ctx.lineTo(240,80);ctx.moveTo(0,160);ctx.lineTo(240,160);ctx.stroke();tttGrid.forEach((v,i)=>{let x=(i%3)*80+40,y=Math.floor(i/3)*80+40;ctx.strokeStyle=v===1?"#2196f3":"#ff9800";if(v===1){ctx.beginPath();ctx.moveTo(x-15,y-15);ctx.lineTo(x+15,y+15);ctx.moveTo(x+15,y-15);ctx.lineTo(x-15,y+15);ctx.stroke();}else if(v===2){ctx.beginPath();ctx.arc(x,y,15,0,Math.PI*2);ctx.stroke();}});}
-document.getElementById("c-ttt").addEventListener("click",e=>{if(mode!=='ttt'||!open||!auth||over)return;const r=e.target.getBoundingClientRect();let idx=Math.floor((e.clientX-r.left)/80)+Math.floor((e.clientY-r.top)/80)*3;if(tttGrid[idx]===0){tttGrid[idx]=1;drawTTT();if(checkTTT(1)){document.getElementById("s-ttt").innerText="You Win!";over=true;return;}if(tttGrid.every(v=>v!==0)){document.getElementById("s-ttt").innerText="Tie Game!";over=true;return;}setTimeout(()=>{let emp=tttGrid.map((v,i)=>v===0?i:null).filter(v=>v!==null);if(emp.length)tttGrid[emp[Math.floor(Math.random()*emp.length)]]=2;drawTTT();if(checkTTT(2)){document.getElementById("s-ttt").innerText="CPU Wins!";over=true;return;}document.getElementById("s-ttt").innerText="Your Turn (X)";},200);}});
-function checkTTT(p){const lines=[,,,,,,,];return lines.some(l=>l.every(i=>tttGrid[i]===p));}
+function start(){over=false;if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();}
 
-let mX,mY,mLevel,mGrid;
-function initM(){mX=1;mY=1;mLevel=1;generateProceduralMaze();drawM();}
-function generateProceduralMaze(){
-mGrid=Array(100).fill(0);
-for(let i=0;i<100;i++){
-let x=i%10,y=Math.floor(i/10);
-if(x===0||x===9||y===0||y===9)mGrid[i]=1;
-else if((x===8&&y===8)||(x===1&&y===1))mGrid[i]=0;
-else if(Math.random()<0.28)mGrid[i]=1;
-}
-}
-function drawM(){
-const ctx=document.getElementById("c-m").getContext("2d");
-ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);
-document.getElementById("s-m").innerText="Level: "+mLevel;
-mGrid.forEach((v,i)=>{
-let x=(i%10)*30,y=Math.floor(i/10)*30;
-if(v===1){ctx.fillStyle="#555";ctx.fillRect(x,y,30,30);}
-});
-ctx.fillStyle="#ff0";ctx.fillRect(8*30+5,8*30+5,20,20);
-ctx.fillStyle="#0f0";ctx.fillRect(mX*30+5,mY*30+5,20,20);
-if(mX===8&&mY===8){
-mLevel++;mX=1;mY=1;
-generateProceduralMaze();
-setTimeout(drawM,150);
-}
-}
-
-function start(){over=false;if(mode==='s')initS();else if(mode==='fb')initF();else if(mode==='ttt')initTTT();else if(mode==='m')initM();}
 document.addEventListener("keydown",e=>{
 if(e.keyCode===27){if(open)toggleDashboard();return;}
 if(!open||!auth||over)return;
+if(mode==='sw'&&(e.keyCode===32||e.keyCode===38)){isHolding=true;e.preventDefault();}
 if(mode==='s'){
 if(e.keyCode===37&&sDir.x===0)nextDir={x:-20,y:0};if(e.keyCode===38&&sDir.y===0)nextDir={x:0,y:-20};if(e.keyCode===39&&sDir.x===0)nextDir={x:20,y:0};if(e.keyCode===40&&sDir.y===0)nextDir={x:0,y:20};
 }else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38)){bV=-6.5;e.preventDefault();}
-else if(mode==='m'){
-let nx=mX,ny=mY;
-if(e.keyCode===37)nx--;if(e.keyCode===39)nx++;if(e.keyCode===38)ny--;if(e.keyCode===40)ny++;
-if(nx>=0&&nx<10&&ny>=0&&ny<10&&mGrid[ny*10+nx]===0){mX=nx;mY=ny;drawM();e.preventDefault();}
-}
 });
+document.addEventListener("keyup",e=>{if(mode==='sw'&&(e.keyCode===32||e.keyCode===38))isHolding=false;});
 document.querySelector(".secret-btn").onclick = toggleDashboard;
 </script>
 </body>
