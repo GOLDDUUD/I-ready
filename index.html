@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GOLDDUUD's Arcade v4</title>
+<title>Wikipedia Research Assistant</title>
 <style>
 body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;background:#f6f6f6;}
 .navbar{height:50px;background:#fff;border-bottom:1px solid #aaa;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
@@ -12,13 +12,13 @@ body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;
 .secret-btn{width:12px;height:12px;background:#e0e0e0;border-radius:50%;cursor:pointer;}
 .dashboard{display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#111;color:#fff;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
 .lock-panel{display:flex;flex-direction:column;align-items:center;background:#222;padding:25px;border-radius:8px;border:1px solid #333;}
-.lock-title{font-family:monospace;font-size:16px;font-weight:bold;color:#ff9800;margin-bottom:15px;text-align:center;}
+.lock-title{font-family:monospace;font-size:16px;font-weight:bold;color:#10b981;margin-bottom:15px;text-align:center;}
 .lock-panel input{padding:8px;background:#000;color:#0f0;border:1px solid #444;border-radius:4px;text-align:center;margin-bottom:10px;}
 .game-panel{display:none;flex-direction:column;align-items:center;}
-.system-title{font-family:monospace;font-size:22px;font-weight:bold;color:#ff9800;letter-spacing:1px;margin-bottom:15px;text-shadow:0 0 8px rgba(255,152,0,0.4);}
+.system-title{font-family:monospace;font-size:22px;font-weight:bold;color:#10b981;letter-spacing:1px;margin-bottom:15px;text-shadow:0 0 8px rgba(16,185,129,0.4);}
 .menu{margin-bottom:15px;display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:500px;}
 button{padding:8px 12px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;font-size:12px;}
-button.active{background:#ff9800;}
+button.active{background:#10b981;}
 .win{display:none;flex-direction:column;align-items:center;} .win.active{display:flex;}
 canvas{background:#000;border:3px solid #444;cursor:pointer;}
 .app-frame{width:550px;height:380px;border:3px solid #444;background:#fff;}
@@ -94,7 +94,7 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button onclick="verify()">SUBMIT</button>
 </div>
 <div id="games" class="game-panel">
-<div class="system-title">🚀 GOLDDUUD's Arcade</div>
+<div class="system-title">🚀 Welcome to GOLDDUUD's Arcade</div>
 <div class="menu">
 <button id="b-rbx" class="active" onclick="setG('rbx')">🎮 Roblox Cloud</button>
 <button id="b-yt" onclick="setG('yt')">📺 YouTube Hub</button>
@@ -103,8 +103,8 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button id="b-s" onclick="setG('s')">Arcade Snake</button>
 <button id="b-fb" onclick="setG('fb')">Flappy Bird</button>
 </div>
-<div id="w-rbx" class="win active"><iframe id="f-rbx" class="app-frame" allow="fullscreen" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Streaming through internal mirror node proxy box...</div></div>
-<div id="w-yt" class="win"><iframe id="f-yt" class="app-frame" allow="fullscreen" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Connecting to unblocked media node...</div></div>
+<div id="w-rbx" class="win active"><iframe id="f-rbx" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Cloaked iframe sandbox engine actively bypassingSAMEORIGIN filters...</div></div>
+<div id="w-yt" class="win"><iframe id="f-yt" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Connecting to unblocked media node...</div></div>
 <div id="w-bb" class="win"><canvas id="c-bb" width="340" height="460"></canvas><div style="font-family:monospace;margin-top:5px;color:#aaa;font-size:16px;">Score: <span id="s-bb">0</span> | Drag and Drop blocks into the grid!</div></div>
 <div id="w-sw" class="win"><canvas id="c-sw" width="400" height="300"></canvas><div style="font-family:monospace;margin-top:5px;font-size:16px;color:#aaa;">Distance: <span id="s-sw">0</span>m</div></div>
 <div id="w-s" class="win"><canvas id="c-s" width="300" height="300"></canvas><div style="font-family:monospace;margin-top:5px;">Score: <span id="s-s">0</span></div></div>
@@ -124,14 +124,22 @@ function sendAIQuery(){const input=document.getElementById("aiInput");const quer
 function toggleDashboard(){open=!open;document.getElementById("dash").style.display=open?"flex":"none";cancelAnimationFrame(loop);if(!open){document.getElementById("f-rbx").src="";document.getElementById("f-yt").src="";}else if(auth)start();}
 function verify(){if(document.getElementById("pw").value==="S2G_250"){auth=true;document.getElementById("lock").style.display="none";document.getElementById("games").style.display="flex";start();}else{document.getElementById("pw").value="";}}
 function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';document.getElementById("b-"+id).className='';});document.getElementById("w-"+g).className='win active';document.getElementById("b-"+g).className='active';start();}
-function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff9800";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
+function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#10b981";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
 games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListener('click',()=>{if(over)start();});});
 
 function start(){
 over=false;
 if(mode==='rbx'){
-// UPDATED EMBED DECOY MIRROR BOX - RUNS DIRECTLY INSIDE CANVASES
-document.getElementById("f-rbx").src="https://nowgg.nl";
+  // Build a deep unblocked blob/sandbox node inside the site box container
+  let frame = document.getElementById("f-rbx");
+  let cloakedDoc = frame.contentWindow || frame.contentDocument.document || frame.contentDocument;
+  cloakedDoc.document.open();
+  cloakedDoc.document.write(`
+    <body style="margin:0;overflow:hidden;background:#000;">
+    <iframe src="https://googleusercontent.com" style="width:100%;height:100vh;border:none;"></iframe>
+    </body>
+  `);
+  cloakedDoc.document.close();
 }else if(mode==='yt'){document.getElementById("f-yt").src="https://youtube.com";}
 else if(mode==='bb')initBB();else if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();
 }
@@ -160,7 +168,7 @@ function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.ra
 </script>
 <script>
 let bbBoard,bbScore,bbShapes,bbDragIdx,bbDragX,bbDragY,bbIsDragging,bbOffsetX,bbOffsetY;
-const bbShapeTypes=[{s:[[1,1],[1,1]],w:2,h:2,c:"#e11d48"},{s:[[1],[1],[1]],w:1,h:3,c:"#ea580c"},{s:[[1,1,1]],w:3,h:1,c:"#ca8a04"},{s:[[1,0],[1,1]],w:2,h:2,c:"#16a34a"},{s:[[0,1],[1,1]],w:2,h:2,c:"#2563eb"}];
+const bbShapeTypes=[{s:[,],w:2,h:2,c:"#e11d48"},{s:[,,],w:1,h:3,c:"#ea580c"},{s:[],w:3,h:1,c:"#ca8a04"},{s:[,],w:2,h:2,c:"#16a34a"},{s:[,],w:2,h:2,c:"#2563eb"}];
 function initBB(){bbBoard=Array.from({length:8},()=>Array(8).fill(0));bbScore=0;bbDragIdx=-1;bbIsDragging=false;spawnShapesBB();const c=document.getElementById("c-bb"),ctx=c.getContext("2d");
 function bbStep(){if(!open||!auth||over||mode!=='bb')return;loop=requestAnimationFrame(bbStep);ctx.fillStyle="#15151e";ctx.fillRect(0,0,340,460);ctx.fillStyle="#1f1f2e";ctx.fillRect(20,20,288,288);ctx.strokeStyle="#2e2e42";ctx.lineWidth=2;for(let i=0;i<=8;i++){ctx.beginPath();ctx.moveTo(20+i*36,20);ctx.lineTo(20+i*36,308);ctx.stroke();ctx.beginPath();ctx.moveTo(20,20+i*36);ctx.lineTo(308,20+i*36);ctx.stroke();}for(let r=0;r<8;r++)for(let col=0;col<8;col++){if(bbBoard[r][col]!==0){ctx.fillStyle=bbBoard[r][col];ctx.fillRect(22+col*36,22+r*36,32,32);}}bbShapes.forEach((s,si)=>{if(s.used||si===bbDragIdx)return;ctx.fillStyle=s.shape.c;s.shape.s.forEach((row,r)=>row.forEach((v,col)=>{if(v)ctx.fillRect(si*105+col*14+25,355+r*14,11,11);}));});if(bbIsDragging&&bbDragIdx!==-1){ctx.fillStyle=bbShapes[bbDragIdx].shape.c;bbShapes[bbDragIdx].shape.s.forEach((row,r)=>row.forEach((v,col)=>{if(v)ctx.fillRect(bbDragX+col*36,bbDragY+r*36,32,32);}));}document.getElementById("s-bb").innerText=bbScore;}loop=requestAnimationFrame(bbStep);}
 function spawnShapesBB(){bbShapes=[];for(let i=0;i<3;i++){bbShapes.push({shape:bbShapeTypes[Math.floor(Math.random()*bbShapeTypes.length)],used:false});}}
