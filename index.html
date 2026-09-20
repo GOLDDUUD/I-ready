@@ -1,211 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard Simulator</title>
+// Dark / light mode
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
-    }
+const themeButton = document.getElementById("themeButton");
 
-    .login, .dashboard {
-      max-width: 500px;
-      margin: 80px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px #0002;
-    }
+themeButton.onclick = () => {
+  document.body.classList.toggle("light");
 
-    h1 {
-      text-align: center;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      box-sizing: border-box;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background: #222;
-      color: white;
-      cursor: pointer;
-      border: none;
-    }
-
-    button:hover {
-      opacity: 0.85;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .status {
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 8px;
-      background: #eee;
-    }
-
-    .admin {
-      background: #dff5df;
-    }
-
-    .student {
-      background: #e5e9ff;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="login" id="loginBox">
-    <h1>Admin Simulator</h1>
-
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
-
-    <button onclick="login()">Sign In</button>
-
-    <p id="error"></p>
-  </div>
-
-  <div class="dashboard hidden" id="dashboard">
-
-    <h1>Dashboard</h1>
-
-    <div id="status" class="status"></div>
-
-    <h3>Available Actions</h3>
-
-    <button onclick="viewGrades()">View Grades</button>
-    <button onclick="manageUsers()">Manage Users</button>
-    <button onclick="adminOnly()">Admin Settings</button>
-    <button onclick="logout()">Log Out</button>
-
-    <p id="result"></p>
-  </div>
-
-<script>
-
-const users = {
-  admin: {
-    password: "admin123",
-    role: "administrator"
-  },
-
-  student: {
-    password: "student123",
-    role: "student"
-  }
+  themeButton.textContent =
+    document.body.classList.contains("light")
+      ? "☀️"
+      : "🌙";
 };
 
-let currentUser = null;
 
-function login() {
+// Game search
 
-  const username =
-    document.getElementById("username").value;
+const search = document.getElementById("search");
 
-  const password =
-    document.getElementById("password").value;
+search.addEventListener("input", () => {
 
-  if (
-    users[username] &&
-    users[username].password === password
+  const text = search.value.toLowerCase();
+
+  document.querySelectorAll(".card").forEach(card => {
+
+    const name = card.innerText.toLowerCase();
+
+    card.style.display =
+      name.includes(text) ? "" : "none";
+
+  });
+
+});
+
+
+// Simple AI recommendation system
+
+function aiRecommend() {
+
+  const input =
+    document.getElementById("aiInput")
+      .value
+      .toLowerCase();
+
+  const result =
+    document.getElementById("aiResult");
+
+  if (input.includes("relax") ||
+      input.includes("calm")) {
+
+    result.textContent =
+      "🤖 Try Memory — it's a calm puzzle game.";
+
+  } else if (
+    input.includes("action") ||
+    input.includes("fast")
   ) {
 
-    currentUser = username;
+    result.textContent =
+      "🤖 Try Pong — fast arcade gameplay!";
 
-    document.getElementById("loginBox")
-      .classList.add("hidden");
+  } else if (
+    input.includes("classic") ||
+    input.includes("old")
+  ) {
 
-    document.getElementById("dashboard")
-      .classList.remove("hidden");
+    result.textContent =
+      "🤖 Try Snake — a classic arcade game.";
 
-    updateDashboard();
+  } else if (
+    input.includes("roblox")
+  ) {
+
+    result.textContent =
+      "🤖 Check the Roblox section for Roblox experiences.";
 
   } else {
 
-    document.getElementById("error").textContent =
-      "Incorrect username or password.";
+    result.textContent =
+      "🤖 I recommend trying Snake or Tic-Tac-Toe!";
   }
 }
 
-function updateDashboard() {
 
-  const role = users[currentUser].role;
+// Placeholder game launchers
 
-  const status =
-    document.getElementById("status");
-
-  status.textContent =
-    "Logged in as: " + currentUser +
-    " (" + role + ")";
-
-  status.className =
-    "status " +
-    (role === "administrator" ? "admin" : "student");
+function playSnake() {
+  alert("Snake game coming next!");
 }
 
-function viewGrades() {
-
-  document.getElementById("result").textContent =
-    "Grades page opened.";
+function playTicTacToe() {
+  alert("Tic-Tac-Toe game coming next!");
 }
 
-function manageUsers() {
-
-  if (users[currentUser].role !== "administrator") {
-
-    document.getElementById("result").textContent =
-      "Access denied: administrator permission required.";
-
-    return;
-  }
-
-  document.getElementById("result").textContent =
-    "User management opened.";
+function playMemory() {
+  alert("Memory game coming next!");
 }
 
-function adminOnly() {
-
-  if (users[currentUser].role !== "administrator") {
-
-    document.getElementById("result").textContent =
-      "Access denied: administrator permission required.";
-
-    return;
-  }
-
-  document.getElementById("result").textContent =
-    "Admin settings opened.";
+function playPong() {
+  alert("Pong game coming next!");
 }
-
-function logout() {
-
-  currentUser = null;
-
-  document.getElementById("dashboard")
-    .classList.add("hidden");
-
-  document.getElementById("loginBox")
-    .classList.remove("hidden");
-
-  document.getElementById("username").value = "";
-  document.getElementById("password").value = "";
-}
-
-</script>
-
-</body>
-</html>
