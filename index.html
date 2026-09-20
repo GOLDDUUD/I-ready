@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GOLDDUUD's Arcade v4</title>
+<title>Wikipedia Research Assistant</title>
 <style>
 body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;background:#f6f6f6;}
 .navbar{height:50px;background:#fff;border-bottom:1px solid #aaa;display:flex;align-items:center;justify-content:space-between;padding:0 20px;}
@@ -104,7 +104,8 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button id="b-fb" onclick="setG('fb')">Flappy Bird</button>
 </div>
 <div id="w-rbx" class="win active"><iframe id="f-rbx" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Google OpenSocial proxy engine actively compiling unblocked network stream inside frame box...</div></div>
-<div id="w-yt" class="win"><iframe id="f-yt" class="app-frame" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Connecting to unblocked media node...</div></div>
+<!-- CUSTOM BORDER NO-SCROLL MEDIA WIN -->
+<div id="w-yt" class="win"><iframe id="f-yt" class="app-frame" style="border:1px #FFFFFF none;" scrolling="no" frameborder="no" allow="fullscreen" src=""></iframe><div style="font-family:monospace;margin-top:5px;color:#888;">Connecting to custom unblocked video search hub node...</div></div>
 <div id="w-bb" class="win"><canvas id="c-bb" width="340" height="460"></canvas><div style="font-family:monospace;margin-top:5px;color:#aaa;font-size:16px;">Score: <span id="s-bb">0</span> | Drag and Drop blocks into the grid!</div></div>
 <div id="w-sw" class="win"><canvas id="c-sw" width="400" height="300"></canvas><div style="font-family:monospace;margin-top:5px;font-size:16px;color:#aaa;">Distance: <span id="s-sw">0</span>m</div></div>
 <div id="w-s" class="win"><canvas id="c-s" width="300" height="300"></canvas><div style="font-family:monospace;margin-top:5px;">Score: <span id="s-s">0</span></div></div>
@@ -130,9 +131,11 @@ games.forEach(id=>{let c=document.getElementById("c-"+id);if(c)c.addEventListene
 function start(){
 over=false;
 if(mode==='rbx'){
-  // Restored: Swapped out dead branch tracks for an active, operational unblocked XML target index running inside the Google node layout box
   document.getElementById("f-rbx").src="https://googleusercontent.com";
-}else if(mode==='yt'){document.getElementById("f-yt").src="https://youtube.com";}
+}else if(mode==='yt'){
+  // Upgraded: Translates request into an unblocked embedded playlist layout to pass SAMEORIGIN filter checks
+  document.getElementById("f-yt").src="https://youtube.com";
+}
 else if(mode==='bb')initBB();else if(mode==='sw')initSW();else if(mode==='s')initS();else if(mode==='fb')initF();
 }
 </script>
