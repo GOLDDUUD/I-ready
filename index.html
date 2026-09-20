@@ -14,6 +14,7 @@ body,html{margin:0;padding:0;height:100%;overflow:hidden;font-family:sans-serif;
 .lock-panel{display:flex;flex-direction:column;align-items:center;background:#222;padding:20px;border-radius:8px;}
 .lock-panel input{padding:8px;background:#000;color:#0f0;border:1px solid #444;border-radius:4px;text-align:center;margin-bottom:10px;}
 .game-panel{display:none;flex-direction:column;align-items:center;}
+.system-title{font-family:monospace;font-size:20px;font-weight:bold;color:#ff9800;letter-spacing:1px;margin-bottom:15px;text-shadow:0 0 8px rgba(255,152,0,0.4);}
 .menu{margin-bottom:15px;}
 button{padding:8px 15px;margin:0 5px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;}
 button.active{background:#4CAF50;}
@@ -90,6 +91,8 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button onclick="verify()">SUBMIT</button>
 </div>
 <div id="games" class="game-panel">
+<!-- CUSTOM USER STAMP TITLE MODULE -->
+<div class="system-title">🚀 GOLDDUUD's games v4</div>
 <div class="menu">
 <button id="b-sw" class="active" onclick="setG('sw')">Space Wave</button>
 <button id="b-s" onclick="setG('s')">Arcade Snake</button>
@@ -116,7 +119,7 @@ function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>
 function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
 games.forEach(id=>{document.getElementById("c-"+id).addEventListener('click',()=>{if(over)start();});});
 
-// --- NEW 60FPS SPACE WAVE GAME ENGINE ---
+// --- 60FPS SPACE WAVE ENGINE ---
 let swY,swV,swDist,swWalls;
 function initSW(){
 swY=150;swV=2.5;swDist=0;swWalls=[];
@@ -124,22 +127,17 @@ const ctx=document.getElementById("c-sw").getContext("2d");
 swWalls.push({x:400,t:0,b:60,w:50});
 function swStep(){
 if(!open||!auth||over||mode!=='sw')return;
-loop=requestAnimationFrame(swStep);
-swDist++;
+loop=requestAnimationFrame(swStep);swDist++;
 if(isHolding){swY-=swV;}else{swY+=swV;}
 if(swY<10||swY>290)return drawOver("c-sw",ctx,400,300);
 if(swWalls[swWalls.length-1].x<280){
-let lastW=swWalls[swWalls.length-1];
 let topHeight=Math.floor(Math.random()*120)+20;
 let botHeight=Math.floor(Math.random()*120)+20;
 swWalls.push({x:400,t:0,b:topHeight,w:40});
 swWalls.push({x:400,t:300-botHeight,b:300,w:40});
 }
-swWalls.forEach((w,i)=>{
-w.x-=3;if(w.x<-50)swWalls.splice(i,1);
-if(w.x<=120&&w.x+w.w>=100){
-if(swY-6<=w.b&&swY+6>=w.t)return drawOver("c-sw",ctx,400,300);
-}
+swWalls.forEach((w,i)=>{w.x-=3;if(w.x<-50)swWalls.splice(i,1);
+if(w.x<=120&&w.x+w.w>=100){if(swY-6<=w.b&&swY+6>=w.t)return drawOver("c-sw",ctx,400,300);}
 });
 ctx.fillStyle="#0a0a1a";ctx.fillRect(0,0,400,300);
 ctx.fillStyle="#00ffff";swWalls.forEach(w=>{ctx.fillRect(w.x,w.t,w.w,w.b-w.t);});
@@ -148,7 +146,7 @@ document.getElementById("s-sw").innerText=Math.floor(swDist/10);
 }loop=requestAnimationFrame(swStep);
 }
 
-// --- FIXED ARCADE SNAKE CODE ---
+// --- SMOOTH ARCADE SNAKE ---
 let sn,sDir,nextDir,sf,sc,lastTime,moveTimer,snakeSpeedBase;
 function initS(){
 sn=[{x:140,y:140},{x:120,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;snakeSpeedBase=130;
@@ -158,7 +156,7 @@ if(!open||!auth||over||mode!=='s')return;
 loop=requestAnimationFrame(sStep);
 let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
 if(moveTimer>=snakeSpeedBase){moveTimer=0;sDir={...nextDir};
-let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
+let h={x:sn.x+sDir.x,y:sn.y+sDir.y};
 if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);
 sn.unshift(h);if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;snakeSpeedBase=Math.max(60,130-(sc/2));spawnSf();}else{sn.pop();}}
 ctx.fillStyle="#111";ctx.fillRect(0,0,300,300);ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(sf.x+10,sf.y+10,8,0,Math.PI*2);ctx.fill();
@@ -168,7 +166,7 @@ document.getElementById("s-s").innerText=sc;
 }
 function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.random()*14)*20+10};}
 
-// --- FLAPPY BIRD CODE ---
+// --- FLAPPY BIRD ENGINE ---
 let bY,bV,pipes,fsc;
 function initF(){
 bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;const ctx=document.getElementById("c-fb").getContext("2d");
