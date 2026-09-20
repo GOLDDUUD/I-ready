@@ -91,7 +91,6 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button onclick="verify()">SUBMIT</button>
 </div>
 <div id="games" class="game-panel">
-<!-- CUSTOM USER STAMP TITLE MODULE -->
 <div class="system-title">🚀 GOLDDUUD's games v4</div>
 <div class="menu">
 <button id="b-sw" class="active" onclick="setG('sw')">Space Wave</button>
@@ -119,7 +118,7 @@ function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>
 function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
 games.forEach(id=>{document.getElementById("c-"+id).addEventListener('click',()=>{if(over)start();});});
 
-// --- 60FPS SPACE WAVE ENGINE ---
+// --- Space Wave Engine ---
 let swY,swV,swDist,swWalls;
 function initSW(){
 swY=150;swV=2.5;swDist=0;swWalls=[];
@@ -146,17 +145,17 @@ document.getElementById("s-sw").innerText=Math.floor(swDist/10);
 }loop=requestAnimationFrame(swStep);
 }
 
-// --- SMOOTH ARCADE SNAKE ---
+// --- FIXED & OVERHAULED SNAKE ENGINE ---
 let sn,sDir,nextDir,sf,sc,lastTime,moveTimer,snakeSpeedBase;
 function initS(){
-sn=[{x:140,y:140},{x:120,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;snakeSpeedBase=130;
+sn=[{x:140,y:140},{x:120,y:140},{x:100,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;snakeSpeedBase=130;
 const ctx=document.getElementById("c-s").getContext("2d");
 function sStep(timestamp){
 if(!open||!auth||over||mode!=='s')return;
 loop=requestAnimationFrame(sStep);
 let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
 if(moveTimer>=snakeSpeedBase){moveTimer=0;sDir={...nextDir};
-let h={x:sn.x+sDir.x,y:sn.y+sDir.y};
+let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};
 if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);
 sn.unshift(h);if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;snakeSpeedBase=Math.max(60,130-(sc/2));spawnSf();}else{sn.pop();}}
 ctx.fillStyle="#111";ctx.fillRect(0,0,300,300);ctx.fillStyle="#ff3333";ctx.beginPath();ctx.arc(sf.x+10,sf.y+10,8,0,Math.PI*2);ctx.fill();
@@ -166,7 +165,7 @@ document.getElementById("s-s").innerText=sc;
 }
 function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.random()*14)*20+10};}
 
-// --- FLAPPY BIRD ENGINE ---
+// --- Flappy Bird Engine ---
 let bY,bV,pipes,fsc;
 function initF(){
 bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;const ctx=document.getElementById("c-fb").getContext("2d");
