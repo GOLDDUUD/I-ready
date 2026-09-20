@@ -21,7 +21,7 @@ button.active{background:#4CAF50;}
 canvas{background:#000;border:3px solid #444;cursor:pointer;}
 .ai-widget{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:#3366cc;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.3);z-index:1000;transition:0.2s;}
 .ai-widget:hover{background:#2a52be;transform:scale(1.05);}
-.ai-box{display:none;position:fixed;bottom:90px;right:20px;width:300px;height:380px;background:#ffffff;border:1px solid #ccc;border-radius:8px;box-shadow:0 4px 15 rgba(0,0,0,0.2);z-index:1000;flex-direction:column;font-family:sans-serif;}
+.ai-box{display:none;position:fixed;bottom:90px;right:20px;width:300px;height:380px;background:#ffffff;border:1px solid #ccc;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:1000;flex-direction:column;font-family:sans-serif;}
 .ai-header{background:#3366cc;color:white;padding:12px;font-weight:bold;font-size:14px;border-top-left-radius:7px;border-top-right-radius:7px;}
 .ai-body{flex:1;padding:10px;overflow-y:auto;background:#f9f9f9;font-size:13px;display:flex;flex-direction:column;gap:8px;}
 .chat-msg{padding:8px 12px;border-radius:6px;max-width:80%;word-wrap:break-word;}
@@ -30,7 +30,7 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 .ai-footer{display:flex;padding:10px;border-top:1px solid #eee;background:#fff;border-bottom-left-radius:7px;border-bottom-right-radius:7px;}
 .ai-footer input{flex:1;padding:6px;border:1px solid #ccc;border-radius:4px;outline:none;font-size:13px;}
 .ai-footer button{padding:6px 12px;background:#3366cc;color:white;border:none;}
-.calc-box{display:none;position:fixed;top:70px;left:20px;width:220px;background:#333;padding:15px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:1001;}
+.calc-box{display:none;position:fixed;top:70px;left:20px;width:220px;background:#333;padding:15px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:1010;}
 .calc-screen{width:100%;height:40px;background:#a1b5a1;color:#000;border:none;border-radius:4px;text-align:right;padding:5px;font-size:18px;font-family:monospace;margin-bottom:10px;box-sizing:border-box;}
 .calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .calc-btn{padding:10px;background:#555;color:#fff;border:none;border-radius:4px;font-weight:bold;cursor:pointer;font-size:14px;}
@@ -70,7 +70,6 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <button class="calc-btn" onclick="pressCalc('0')">0</button>
 </div>
 </div>
-
 <div class="ai-widget" onclick="toggleAI()">🤖</div>
 <div id="aiBox" class="ai-box">
 <div class="ai-header">Core Research Assistant v1.0</div>
@@ -99,72 +98,7 @@ canvas{background:#000;border:3px solid #444;cursor:pointer;}
 <div id="w-s" class="win active"><canvas id="c-s" width="300" height="300"></canvas><div>Score: <span id="s-s">0</span></div></div>
 <div id="w-fb" class="win"><canvas id="c-fb" width="320" height="320"></canvas><div>Score: <span id="s-f">0</span></div></div>
 <div id="w-ttt" class="win"><canvas id="c-ttt" width="240" height="240"></canvas><div id="s-ttt" style="font-family:monospace;color:#aaa;margin-top:5px;">Your Turn</div></div>
-<div id="w-m" class="win"><canvas id="c-m" width="300" height="300"></canvas><div id="s-m" style="font-family:monospace;color:#aaa;margin-top:5px;">Use Arrows to reach the Yellow Square!</div></div>
+<div id="w-m" class="win"><canvas id="c-m" width="300" height="300"></canvas><div id="s-m" style="font-family:monospace;color:#aaa;margin-top:5px;">Escape to the Yellow Square!</div></div>
 <p style="color:#666;font-size:12px;margin-top:15px;">Press ESC key or click top-right dot to exit instantly</p>
 </div>
 </div>
-<script>
-let open=false,auth=false,mode='s',loop,over=false,aiOpen=false,calcOpen=false,calcExpr="";
-const games=['s','fb','ttt','m'];
-function toggleCalc()){calcOpen=!calcOpen;document.getElementById("calcBox").style.display=calcOpen?"block":"none";}
-function pressCalc(v){calcExpr+=v;document.getElementById("calcDisplay").value=calcExpr;}
-function clearCalc()){calcExpr="";document.getElementById("calcDisplay").value="0";}
-function solveCalc(){try{let res=eval(calcExpr);document.getElementById("calcDisplay").value=res||0;calcExpr=res?res.toString():"";}catch(e){document.getElementById("calcDisplay").value="Error";calcExpr="";}}
-function toggleAI()){aiOpen=!aiOpen;document.getElementById("aiBox").style.display=aiOpen?"flex":"none";}
-function sendAIQuery(){const input=document.getElementById("aiInput");const query=input.value.trim();if(!query)return;const body=document.getElementById("aiBody");const uMsg=document.createElement("div");uMsg.className="chat-msg msg-user";uMsg.innerText=query;body.appendChild(uMsg);input.value="";body.scrollTop=body.scrollHeight;setTimeout(()=>{const aiMsg=document.createElement("div");aiMsg.className="chat-msg msg-ai";aiMsg.innerText="Searching indexes...";body.appendChild(aiMsg);document.getElementById("wf").src="https://wikipedia.org"+encodeURIComponent(query);body.scrollTop=body.scrollHeight;},400);}
-function toggleDashboard(){open=!open;document.getElementById("dash").style.display=open?"flex":"none";cancelAnimationFrame(loop);if(open&&auth)start();}
-function verify(){if(document.getElementById("pw").value==="S2G_250"){auth=true;document.getElementById("lock").style.display="none";document.getElementById("games").style.display="flex";start();}else{document.getElementById("pw").value="";}}
-function setG(g){cancelAnimationFrame(loop);mode=g;over=false;games.forEach(id=>{document.getElementById("w-"+id).className='win';});document.getElementById("w-"+g).className='win active';document.getElementById("b-s").className=g==='s'?'active':'';document.getElementById("b-fb").className=g==='fb'?'active':'';document.getElementById("b-ttt").className=g==='ttt'?'active':'';document.getElementById("b-m").className=g==='m'?'active':'';start();}
-function drawOver(canvasId,ctx,w,h){over=true;cancelAnimationFrame(loop);ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,w,h);ctx.fillStyle="#ff3333";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("GAME OVER",w/2,h/2-5);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Restart",w/2,h/2+20);}
-document.getElementById("c-s").addEventListener('click',()=>{if(over)start();});document.getElementById("c-fb").addEventListener('click',()=>{if(over)start();});document.getElementById("c-ttt").addEventListener('click',()=>{if(over)start();});document.getElementById("c-m").addEventListener('click',()=>{if(over)start();});
-
-let sn,sDir,nextDir,sf,sc,lastTime,moveTimer;
-function initS(){
-sn=[{x:140,y:140},{x:120,y:140}];sDir={x:20,y:0};nextDir={x:20,y:0};sc=0;spawnSf();lastTime=performance.now();moveTimer=0;const ctx=document.getElementById("c-s").getContext("2d");
-function sStep(timestamp){if(!open||!auth||over||mode!=='s')return;loop=requestAnimationFrame(sStep);let dt=timestamp-lastTime;lastTime=timestamp;moveTimer+=dt;
-if(moveTimer>=90){moveTimer=0;sDir={...nextDir};let h={x:sn[0].x+sDir.x,y:sn[0].y+sDir.y};if(h.x<0||h.x>=300||h.y<0||h.y>=300||sn.some(p=>p.x===h.x&&p.y===h.y))return drawOver("c-s",ctx,300,300);sn.unshift(h);if(Math.abs(h.x-sf.x)<15&&Math.abs(h.y-sf.y)<15){sc+=10;spawnSf();}else{sn.pop();}}
-ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);ctx.fillStyle="#f44";ctx.fillRect(sf.x,sf.y,16,16);ctx.fillStyle="#4CAF50";sn.forEach((p,i)=>{ctx.fillStyle=i===0?"#81C784":"#4CAF50";ctx.fillRect(p.x,p.y,18,18);});document.getElementById("s-s").innerText=sc;}loop=requestAnimationFrame(sStep);
-}
-function spawnSf(){sf={x:Math.floor(Math.random()*14)*20+10,y:Math.floor(Math.random()*14)*20+10};}
-
-let bY,bV,pipes,fsc;
-function initF(){
-bY=140;bV=0;pipes=[{x:320,t:80,b:150}];fsc=0;const ctx=document.getElementById("c-fb").getContext("2d");
-function fStep(){if(!open||!auth||over||mode!=='fb')return;loop=requestAnimationFrame(fStep);bV+=0.4;bY+=bV;if(bY>310||bY<5)return drawOver("c-fb",ctx,320,320);if(pipes[pipes.length-1].x<180){let th=Math.floor(Math.random()*110)+30;pipes.push({x:320,t:th,b:230-th});}
-pipes.forEach((p,i)=>{p.x-=2;if(p.x<-40){pipes.splice(i,1);fsc++;}if(p.x<=74&&p.x+40>=56&&(bY-8<=p.t||bY+8>=320-p.b))return drawOver("c-fb",ctx,320,320);});
-ctx.fillStyle="#4ec0ca";ctx.fillRect(0,0,320,320);ctx.fillStyle="#73bf2e";pipes.forEach(p=>{ctx.fillRect(p.x,0,40,p.t);ctx.fillRect(p.x,320-p.b,40,p.b);});ctx.fillStyle="#f8e71c";ctx.beginPath();ctx.arc(65,bY,9,0,Math.PI*2);ctx.fill();document.getElementById("s-f").innerText=fsc;}loop=requestAnimationFrame(fStep);
-}
-
-let tttGrid;
-function initTTT(){tttGrid=Array(9).fill(0);drawTTT();document.getElementById("s-ttt").innerText="Your Turn (X)";}
-function drawTTT(){const ctx=document.getElementById("c-ttt").getContext("2d");ctx.fillStyle="#000";ctx.fillRect(0,0,240,240);ctx.strokeStyle="#444";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(80,0);ctx.lineTo(80,240);ctx.moveTo(160,0);ctx.lineTo(160,240);ctx.moveTo(0,80);ctx.lineTo(240,80);ctx.moveTo(0,160);ctx.lineTo(240,160);ctx.stroke();tttGrid.forEach((v,i)=>{let x=(i%3)*80+40,y=Math.floor(i/3)*80+40;ctx.strokeStyle=v===1?"#2196f3":"#ff9800";if(v===1){ctx.beginPath();ctx.moveTo(x-15,y-15);ctx.lineTo(x+15,y+15);ctx.moveTo(x+15,y-15);ctx.lineTo(x-15,y+15);ctx.stroke();}else if(v===2){ctx.beginPath();ctx.arc(x,y,15,0,Math.PI*2);ctx.stroke();}});}
-document.getElementById("c-ttt").addEventListener("click",e=>{if(mode!=='ttt'||!open||!auth||over)return;const r=e.target.getBoundingClientRect();let idx=Math.floor((e.clientX-r.left)/80)+Math.floor((e.clientY-r.top)/80)*3;if(tttGrid[idx]===0){tttGrid[idx]=1;drawTTT();if(checkTTT(1)){document.getElementById("s-ttt").innerText="You Win!";over=true;return;}if(tttGrid.every(v=>v!==0)){document.getElementById("s-ttt").innerText="Tie Game!";over=true;return;}setTimeout(()=>{let emp=tttGrid.map((v,i)=>v===0?i:null).filter(v=>v!==null);if(emp.length)tttGrid[emp[Math.floor(Math.random()*emp.length)]]=2;drawTTT();if(checkTTT(2)){document.getElementById("s-ttt").innerText="CPU Wins!";over=true;return;}document.getElementById("s-ttt").innerText="Your Turn (X)";},200);}});
-function checkTTT(p){const lines=[0,1,2,3,4,5,6,7,8];return lines.some(l=>l.every(i=>tttGrid[i]===p));}
-
-let mX,mY;
-const mGrid=[,
-[1,0,0,0,1,0,0,0,0,1],
-[1,0,1,0,1,0,1,1,0,1],
-[1,0,1,0,0,0,1,0,0,1],
-[1,0,1,1,1,1,1,0,1,1],
-[1,0,0,0,0,0,1,0,0,1],
-[1,1,1,0,1,0,1,1,0,1],
-[1,0,0,0,1,0,0,1,0,1],
-[1,0,1,0,1,1,0,0,0,1],
-[1,1,1,1,1,1,1,1,1,1]
-];
-function initM(){mX=1;mY=1;drawM();document.getElementById("s-m").innerText="Escape to the Yellow Square!";}
-function drawM(){const ctx=document.getElementById("c-m").getContext("2d");ctx.fillStyle="#000";ctx.fillRect(0,0,300,300);mGrid.forEach((r,y)=>r.forEach((v,x)=>{if(v===1){ctx.fillStyle="#555";ctx.fillRect(x*30,y*30,30,30);}}));ctx.fillStyle="#ff0";ctx.fillRect(8*30+5,8*30+5,20,20);ctx.fillStyle="#0f0";ctx.fillRect(mX*30+5,mY*30+5,20,20);if(mX===8&&mY===8){document.getElementById("s-m").innerText="Maze Cleared!";over=true;ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,300,300);ctx.fillStyle="#0f0";ctx.font="bold 20px monospace";ctx.textAlign="center";ctx.fillText("VICTORY!",150,140);ctx.fillStyle="#fff";ctx.font="12px monospace";ctx.fillText("Click Inside Box to Play Again",150,180);}}
-
-function start(){over=false;if(mode==='s')initS();else if(mode==='fb')initF();else if(mode==='ttt')initTTT();else if(mode==='m')initM();}
-document.addEventListener("keydown",e=>{
-if(e.keyCode===27){if(open)toggleDashboard();return;}
-if(!open||!auth||over)return;
-if(mode==='s'){
-if(e.keyCode===37&&sDir.x===0)nextDir={x:-20,y:0};if(e.keyCode===38&&sDir.y===0)nextDir={x:0,y:-20};if(e.keyCode===39&&sDir.x===0)nextDir={x:20,y:0};if(e.keyCode===40&&sDir.y===0)nextDir={x:0,y:20};
-}else if(mode==='fb'&&(e.keyCode===32||e.keyCode===38)){bV=-6.5;e.preventDefault();}
-else if(mode==='m'){let nx=mX,ny=mY;if(e.keyCode===37)nx--;if(e.keyCode===39)nx++;if(e.keyCode===38)ny--;if(e.keyCode===40)ny++;if(mGrid[ny][nx]===0){mX=nx;mY=ny;drawM();e.preventDefault();}}
-});
-</script>
-</body>
-</html>
