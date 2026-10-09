@@ -19,6 +19,15 @@
   </style>
 </head>
 <body>
+  <script>
+    // Simple client-side password protection
+    var password = prompt("Please enter the password to access this site:");
+    if (password !== "122014") {
+      alert("Incorrect password.");
+      window.location.href = "about:blank"; // Redirects away if wrong
+    }
+  </script>
+
   <!-- Change the web link inside the quotes below to the game or site you want to load -->
   <iframe src="https://frogiesarcade.net"></iframe>
 </body>
