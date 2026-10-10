@@ -73,80 +73,86 @@
       text-align: center;
     }
     
-    h1 {
-      margin-top: 0;
+    .sub-text {
+      font-size: 14px;
+      color: #cccccc;
       margin-bottom: 30px;
-      color: #e5e5e5;
-      font-size: 20px;
-      letter-spacing: 1px;
       text-align: center;
     }
 
-    /* Dark/Gold themed sleek buttons */
-    .btn {
-      padding: 15px 30px;
+    /* Stylish golden UI button */
+    .gold-btn {
+      background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+      border: 2px solid #ffdf00;
+      color: #000;
+      padding: 15px 40px;
       font-size: 18px;
-      margin: 12px;
-      cursor: pointer;
-      border: 2px solid #d4af37; /* Gold border */
-      border-radius: 8px;
-      background-color: rgba(20, 20, 20, 0.95); /* Dark block inside */
-      color: #ffdf00; /* Bright gold text */
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
       transition: all 0.3s ease;
-      min-width: 200px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
     }
 
-    /* Hover effect makes the button light up gold */
-    .btn:hover {
-      background-color: #d4af37;
-      color: #111111;
-      box-shadow: 0 0 20px #ffdf00;
-      transform: translateY(-2px); /* Slight lifting motion */
+    /* Hover animations for the button */
+    .gold-btn:hover {
+      background: linear-gradient(135deg, #ffdf00 0%, #d4af37 100%);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(255, 223, 0, 0.6);
+    }
+
+    .gold-btn:active {
+      transform: translateY(1px);
     }
   </style>
 </head>
 <body>
 
-  <!-- Menu that shows after entering the password -->
+  <!-- The Launch Menu Screen -->
   <div id="menu">
-    <!-- HTML5 canvas for drawing the rain -->
     <canvas id="goldRainCanvas"></canvas>
-
-    <!-- Wrapper keeps buttons working and interactive above the animation -->
+    
     <div class="menu-content">
-      <div class="welcome-text">Welcome to GOLDDUUD's arcade</div>
-      <h1>Where do you want to go?</h1>
-      <button class="btn" onclick="navigateTo('https://frogiesarcade.net')">Frogies Arcade</button>
-      <button class="btn" onclick="navigateTo('https://ixl.ad')">IXL Ad</button>
+      <div class="welcome-text">Welcome back</div>
+      <div class="sub-text">Click below to load your platform</div>
+      <button class="gold-btn" onclick="launchPlatform()">Launch</button>
     </div>
   </div>
 
-  <!-- The iframe that will display the selected website inside your page -->
+  <!-- The Frame that will hold the website -->
   <iframe id="siteFrame" src=""></iframe>
 
   <script>
-    // Simple client-side password protection
-    var password = prompt("Please enter the password to access this site:");
-    if (password !== "122014") {
-      alert("Incorrect password.");
-      window.location.href = "about:blank"; // Redirects away if wrong
+    function launchPlatform() {
+      // Ask the user where they want to go
+      var choice = prompt("Where do you wanna go? (type 'frogies arcade' or 'Kiwi Games')");
+      
+      if (choice === null) return; // User pressed cancel
+      
+      var choiceClean = choice.trim().toLowerCase();
+      var frame = document.getElementById("siteFrame");
+      var menu = document.getElementById("menu");
+      
+      if (choiceClean === "frogies arcade") {
+        frame.src = "https://frogiesarcade.com"; // Replace with actual Frogies URL if different
+        menu.style.display = "none";
+        frame.style.display = "block";
+      } else if (choiceClean === "kiwi games") {
+        frame.src = "https://kiwigames.com"; // Replace with actual Kiwi Games URL if different
+        menu.style.display = "none";
+        frame.style.display = "block";
+      } else {
+        alert("Invalid option. Please type either 'frogies arcade' or 'Kiwi Games'.");
+      }
     }
 
-    // Function to load the site inside the iframe
-    function navigateTo(url) {
-      document.getElementById('menu').style.display = 'none'; // Hide the menu buttons
-      var iframe = document.getElementById('siteFrame');
-      iframe.src = url;                                       // Load the website URL
-      iframe.style.display = 'block';                        // Show the iframe full screen
-    }
-
-    // --- GOLD BLOCKS RAIN ANIMATION ENGINE ---
+    // --- Matrix Golden Rain Animation ---
     const canvas = document.getElementById('goldRainCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Make canvas fill the full window size
+    // Resize canvas dynamically
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -154,50 +160,44 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Setup golden cube array
-    const blocks = [];
-    const blockCount = 50; // Total number of blocks falling at once
-    const goldColors = ['#ffd700', '#d4af37', '#aa7c11', '#ffdf00', '#f3cd44'];
-
-    for (let i = 0; i < blockCount; i++) {
-      blocks.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        size: Math.random() * 12 + 6,         // Size of block (6px to 18px)
-        speed: Math.random() * 3 + 1.5,       // Fall rate
-        color: goldColors[Math.floor(Math.random() * goldColors.length)],
-        opacity: Math.random() * 0.5 + 0.3    // Keeps them subtle in the background
-      });
+    // Block properties
+    const columns = Math.floor(canvas.width / 20);
+    const drops = [];
+    // Initialize drops out of view
+    for (let x = 0; x < columns; x++) {
+      drops[x] = Math.random() * -100; 
     }
 
-    // Continuous render loop
-    function drawRain() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function draw() {
+      // Semi-transparent black clear to create trailing blur effect
+      ctx.fillStyle = 'rgba(13, 13, 13, 0.15)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      blocks.forEach(block => {
-        ctx.fillStyle = block.color;
-        ctx.globalAlpha = block.opacity;
-        
-        // Draw the block
-        ctx.fillRect(block.x, block.y, block.size, block.size);
+      // Set gold shading configurations
+      ctx.fillStyle = '#d4af37'; 
+      ctx.font = '15px monospace';
 
-        // Update block path downward
-        block.y += block.speed;
+      for (let i = 0; i < drops.length; i++) {
+        // Pick random characters/numbers to mimic digital rain blocks
+        const text = Math.floor(Math.random() * 10);
+        const x = i * 20;
+        const y = drops[i] * 20;
 
-        // Reset block back to top once it hits the bottom
-        if (block.y > canvas.height) {
-          block.y = -block.size;
-          block.x = Math.random() * canvas.width;
-          block.speed = Math.random() * 3 + 1.5;
+        // Randomly alternate shades of gold for visual depth
+        ctx.fillStyle = Math.random() > 0.5 ? '#ffdf00' : '#aa7c11';
+        ctx.fillText(text, x, y);
+
+        // Reset drop back to top after leaving screen with randomized delay
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
-      });
-
-      ctx.globalAlpha = 1.0; // Reset canvas transparency
-      requestAnimationFrame(drawRain);
+        drops[i]++;
+      }
     }
 
-    // Run the rain engine
-    drawRain();
+    // Run code engine loop
+    setInterval(draw, 33);
   </script>
+
 </body>
 </html>
