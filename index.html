@@ -1,34 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!-- Change your website title right here -->
-  <title>Clever | Recources</title>
-  
+  <title>Clever | Resources Portal</title>
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
+      background-color: #1a1a1a; /* Changed to dark gray so you can instantly see it's the new version */
+      font-family: Arial, sans-serif;
     }
-    iframe {
-      width: 100%;
+    #menu {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       height: 100%;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+    .btn {
+      display: inline-block;
+      padding: 15px 30px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
       border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      min-width: 180px;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
+
+  <div id="menu">
+    <h1>Where do you want to go?</h1>
+    <a href="https://frogiesarcade.net" target="_blank" class="btn">Frogies Arcade</a>
+    <a href="https://ixl.ad" target="_blank" class="btn">IXL Ad</a>
+  </div>
+
   <script>
-    // Simple client-side password protection
+    // This pop-up will prove you are running the NEW code
+    alert("SUCCESS: You are running the new button code!");
+
     var password = prompt("Please enter the password to access this site:");
     if (password !== "122014") {
       alert("Incorrect password.");
-      window.location.href = "about:blank"; // Redirects away if wrong
+      window.location.href = "about:blank";
     }
   </script>
-
-  <!-- Change the web link inside the quotes below to the game or site you want to load -->
-  <iframe src="https://frogiesarcade.net"></iframe>
 </body>
 </html>
