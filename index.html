@@ -18,33 +18,68 @@
       border: none;
       display: none; /* Hidden until you click a button */
     }
-    /* Menu container styles */
+    
+    /* Cool animated golden background */
     #menu {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
-      background-color: #f0f2f5;
+      /* Shifting gold gradient colors */
+      background: linear-gradient(-45deg, #111111, #d4af37, #aa7c11, #1a1a1a);
+      background-size: 400% 400%;
+      animation: goldWave 10s ease infinite;
     }
+
+    /* Keyframes that make the background shift smoothly */
+    @keyframes goldWave {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Welcome text style with glow effect */
+    .welcome-text {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ffffff; 
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #ffdf00, 0 0 20px #d4af37; /* Gold neon glow */
+    }
+    
     h1 {
-      margin-bottom: 20px;
-      color: #333;
+      margin-top: 0;
+      margin-bottom: 30px;
+      color: #e5e5e5;
+      font-size: 20px;
+      letter-spacing: 1px;
     }
+
+    /* Dark/Gold themed sleek buttons */
     .btn {
       padding: 15px 30px;
       font-size: 18px;
-      margin: 10px;
+      margin: 12px;
       cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      transition: background-color 0.2s;
-      min-width: 180px;
+      border: 2px solid #d4af37; /* Gold border */
+      border-radius: 8px;
+      background-color: rgba(26, 26, 26, 0.9); /* Dark semi-transparent inside */
+      color: #ffdf00; /* Bright gold text */
+      font-weight: bold;
+      transition: all 0.3s ease;
+      min-width: 200px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
+
+    /* Hover effect makes the button light up gold */
     .btn:hover {
-      background-color: #0056b3;
+      background-color: #d4af37;
+      color: #111111;
+      box-shadow: 0 0 15px #ffdf00;
+      transform: translateY(-2px); /* Slight lifting motion */
     }
   </style>
 </head>
@@ -52,6 +87,7 @@
 
   <!-- Menu that shows after entering the password -->
   <div id="menu">
+    <div class="welcome-text">Welcome to GOLDDUUD's arcade</div>
     <h1>Where do you want to go?</h1>
     <button class="btn" onclick="navigateTo('https://frogiesarcade.net')">Frogies Arcade</button>
     <button class="btn" onclick="navigateTo('https://ixl.ad')">IXL Ad</button>
