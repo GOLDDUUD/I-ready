@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Clever | Resources Portal</title>
+  <!-- Change your website title right here -->
+  <title>Clever | Recources</title>
+  
   <style>
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: #1a1a1a; /* Changed to dark gray so you can instantly see it's the new version */
+      overflow: hidden;
       font-family: Arial, sans-serif;
     }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none; /* Hidden until you click a button */
+    }
+    /* Menu container styles */
     #menu {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100%;
+      background-color: #f0f2f5;
     }
     h1 {
       margin-bottom: 20px;
-      color: #ffffff;
+      color: #333;
     }
     .btn {
-      display: inline-block;
       padding: 15px 30px;
       font-size: 18px;
       margin: 10px;
@@ -31,10 +40,8 @@
       border-radius: 5px;
       background-color: #007bff;
       color: white;
-      text-decoration: none;
-      text-align: center;
-      min-width: 180px;
       transition: background-color 0.2s;
+      min-width: 180px;
     }
     .btn:hover {
       background-color: #0056b3;
@@ -43,20 +50,30 @@
 </head>
 <body>
 
+  <!-- Menu that shows after entering the password -->
   <div id="menu">
     <h1>Where do you want to go?</h1>
-    <a href="https://frogiesarcade.net" target="_blank" class="btn">Frogies Arcade</a>
-    <a href="https://ixl.ad" target="_blank" class="btn">IXL Ad</a>
+    <button class="btn" onclick="navigateTo('https://frogiesarcade.net')">Frogies Arcade</button>
+    <button class="btn" onclick="navigateTo('https://ixl.ad')">IXL Ad</button>
   </div>
 
-  <script>
-    // This pop-up will prove you are running the NEW code
-    alert("SUCCESS: You are running the new button code!");
+  <!-- The iframe that will display the selected website inside your page -->
+  <iframe id="siteFrame" src=""></iframe>
 
+  <script>
+    // Simple client-side password protection
     var password = prompt("Please enter the password to access this site:");
     if (password !== "122014") {
       alert("Incorrect password.");
-      window.location.href = "about:blank";
+      window.location.href = "about:blank"; // Redirects away if wrong
+    }
+
+    // Function to load the site inside the iframe
+    function navigateTo(url) {
+      document.getElementById('menu').style.display = 'none'; // Hide the menu buttons
+      var iframe = document.getElementById('siteFrame');
+      iframe.src = url;                                       // Load the website URL
+      iframe.style.display = 'block';                        // Show the iframe full screen
     }
   </script>
 </body>
