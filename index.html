@@ -105,9 +105,60 @@
       box-shadow: 0 0 20px #ffdf00;
       transform: translateY(-2px); /* Slight lifting motion */
     }
+
+    /* Password overlay box styling to replace the prompt */
+    #passwordOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #0d0d0d;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .pass-box {
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #d4af37;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
+    }
+    .pass-box label {
+      color: #ffffff;
+      font-size: 18px;
+      display: block;
+      margin-bottom: 15px;
+    }
+    .pass-box input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #d4af37;
+      background: #222;
+      color: #fff;
+      text-align: center;
+      outline: none;
+      margin-bottom: 15px;
+      width: 200px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Password Screen Overlay -->
+  <div id="passwordOverlay">
+    <div class="pass-box">
+      <label for="passInput">Please enter the password to access this site:</label>
+      <input type="password" id="passInput" onkeydown="checkPasswordKey(event)">
+      <br>
+      <button class="btn" style="min-width: 120px; padding: 10px 20px; font-size: 16px; margin: 0;" onclick="submitPassword()">Submit</button>
+    </div>
+  </div>
 
   <!-- Menu that shows after entering the password -->
   <div id="menu">
@@ -119,7 +170,7 @@
       <div class="welcome-text">Welcome to GOLDDUUD's arcade</div>
       <h1>Where do you want to go?</h1>
       <button class="btn" onclick="navigateTo('https://frogiesarcade.net')">Frogies Arcade</button>
-      <button class="btn" onclick="navigateTo('https://ixl.ad')">Kiwi Games</button>
+      <button class="btn" onclick="navigateTo('https://kiwigames.com')">Kiwi Games</button>
     </div>
   </div>
 
@@ -127,11 +178,22 @@
   <iframe id="siteFrame" src=""></iframe>
 
   <script>
-    // Simple client-side password protection
-    var password = prompt("Please enter the password to access this site:");
-    if (password !== "122014") {
-      alert("Incorrect password.");
-      window.location.href = "about:blank"; // Redirects away if wrong
+    // Password verification system
+    function submitPassword() {
+      var passwordInput = document.getElementById("passInput").value;
+      if (passwordInput === "122014") {
+        document.getElementById("passwordOverlay").style.display = "none";
+      } else {
+        alert("Incorrect password.");
+        window.location.href = "about:blank"; // Redirects away if wrong
+      }
+    }
+
+    // Allows pressing Enter to submit password
+    function checkPasswordKey(event) {
+      if (event.key === "Enter") {
+        submitPassword();
+      }
     }
 
     // Function to load the site inside the iframe
