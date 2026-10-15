@@ -1,158 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!-- 1. FIXED BRANDING: Changed title to reflect your actual group name -->
-  <title>Clever Designs | Arcade & Resources</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clever Designs | Premium Arcade Hub</title>
   
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background-color: #0d0d0d;
+    :root {
+      --gold-bright: #ffdf00; --gold-dark: #aa7c11; --gold-mid: #d4af37;
+      --bg-dark: #0a0a0a; --card-bg: rgba(25, 25, 25, 0.75);
     }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: none; 
-    }
-    
-    /* Cool animated golden background */
-    #menu {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-      background: linear-gradient(-45deg, #0d0d0d, #aa7c11, #4a3600, #141414);
-      background-size: 400% 400%;
-      animation: goldWave 12s ease infinite;
-      overflow: hidden;
-    }
-
-    @keyframes goldWave {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    #goldRainCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none; 
-    }
-
-    .menu-content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .welcome-text {
-      font-size: 32px;
-      font-weight: bold;
-      color: #ffffff; 
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px #ffdf00, 0 0 20px #d4af37; 
-      text-align: center;
-    }
-    
-    h1 {
-      margin-top: 0;
-      margin-bottom: 30px;
-      color: #e5e5e5;
-      font-size: 20px;
-      letter-spacing: 1px;
-      text-align: center;
-    }
-
-    .btn {
-      padding: 15px 30px;
-      font-size: 18px;
-      margin: 12px;
-      cursor: pointer;
-      border: 2px solid #d4af37; 
-      border-radius: 8px;
-      background-color: rgba(20, 20, 20, 0.95); 
-      color: #ffdf00; 
-      font-weight: bold;
-      transition: all 0.3s ease;
-      min-width: 200px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-    }
-
-    .btn:hover {
-      background-color: #d4af37;
-      color: #111111;
-      box-shadow: 0 0 20px #ffdf00;
-      transform: translateY(-2px); 
-    }
-
-    /* Floating Back Button for UI polish */
-    #backBtn {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 10000;
-      display: none;
-      padding: 10px 20px;
-      font-size: 14px;
-      min-width: auto;
-      margin: 0;
-      background: rgba(13, 13, 13, 0.9);
-    }
-
-    #passwordOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #0d0d0d;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    .pass-box {
-      background: rgba(20, 20, 20, 0.95);
-      border: 2px solid #d4af37;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
-    }
-    .pass-box label {
-      color: #ffffff;
-      font-size: 18px;
-      display: block;
-      margin-bottom: 15px;
-    }
-    .pass-box input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #d4af37;
-      background: #222;
-      color: #fff;
-      text-align: center;
-      outline: none;
-      margin-bottom: 15px;
-      width: 200px;
-    }
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-dark); color: #ffffff; }
+    iframe { width: 100%; height: 100%; border: none; display: none; background-color: var(--bg-dark); }
+    #menu { position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; height: 100%; width: 100%; background: linear-gradient(-45deg, #050505, #5c4308, #1a1403, #0d0d0d); background-size: 400% 400%; animation: goldWave 15s ease infinite; overflow-y: auto; box-sizing: border-box; padding: 40px 20px; }
+    @keyframes goldWave { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    #goldRainCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+    .menu-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; margin: auto; }
+    .welcome-text { font-size: 38px; font-weight: 900; color: #ffffff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px var(--gold-bright), 0 0 30px var(--gold-mid); text-align: center; }
+    h1 { margin-top: 0; margin-bottom: 40px; color: #b5b5b5; font-size: 18px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; width: 100%; padding: 10px; box-sizing: border-box; }
+    .game-card { background: var(--card-bg); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; overflow: hidden; }
+    .game-card:hover { transform: translateY(-8px); border-color: var(--gold-bright); box-shadow: 0 12px 30px rgba(255, 223, 0, 0.2); }
+    .game-icon { font-size: 42px; margin-bottom: 15px; display: inline-block; }
+    .game-title { font-size: 20px; font-weight: 750; color: var(--gold-bright); margin-bottom: 8px; }
+    .game-desc { font-size: 13px; color: #a0a0a0; line-height: 1.4; }
+    #toolbar { position: fixed; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; z-index: 10000; pointer-events: none; }
+    .action-btn { padding: 10px 20px; font-size: 14px; cursor: pointer; border: 1.5px solid var(--gold-mid); border-radius: 30px; background-color: rgba(10, 10, 10, 0.9); color: var(--gold-bright); font-weight: bold; transition: all 0.3s ease; pointer-events: auto; text-transform: uppercase; letter-spacing: 1px; }
+    .action-btn:hover { background-color: var(--gold-mid); color: #000000; box-shadow: 0 0 15px var(--gold-bright); transform: scale(1.05); }
+    #backBtn { display: none; }
+    #passwordOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #050505; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .pass-box { background: rgba(18, 18, 18, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); padding: 40px; border-radius: 24px; text-align: center; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0,0,0,0.7); max-width: 340px; width: 85%; }
+    .pass-box label { color: #ffffff; font-size: 20px; font-weight: 700; display: block; margin-bottom: 8px; }
+    .pass-sublabel { color: #888; font-size: 13px; margin-bottom: 25px; }
+    .pass-box input { padding: 14px; font-size: 18px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.5); background: rgba(30, 30, 30, 0.6); color: #fff; text-align: center; outline: none; margin-bottom: 10px; width: 100%; box-sizing: border-box; letter-spacing: 4px; }
+    #errorMsg { color: #ff4a4a; font-size: 13px; margin-top: 8px; min-height: 18px; }
   </style>
 </head>
 <body>
@@ -160,118 +41,90 @@
   <!-- Password Screen Overlay -->
   <div id="passwordOverlay">
     <div class="pass-box">
-      <!-- 2. FIXED BRANDING: Clearly identifies Clever Designs group -->
-      <label for="passInput">Clever Designs Portal<br><br>Enter password to unlock arcade:</label>
-      <input type="password" id="passInput" onkeydown="checkPasswordKey(event)">
-      <br>
-      <button class="btn" style="min-width: 120px; padding: 10px 20px; font-size: 16px; margin: 0;" onclick="submitPassword()">Submit</button>
+      <label>Clever Designs</label>
+      <div class="pass-sublabel">Enter passcode to unlock arcade hub</div>
+      <input type="password" id="passInput" onkeydown="checkPasswordKey(event)" autofocus>
+      <div id="errorMsg"></div>
+      <button class="action-btn" style="width: 100%; margin-top: 15px; padding: 14px;" onclick="submitPassword()">Unlock Access</button>
     </div>
   </div>
 
-  <!-- UI Upgrade: Floating back button to return from a game -->
-  <button id="backBtn" class="btn" onclick="returnToMenu()">← Back to Menu</button>
+  <!-- Navigation Toolbar -->
+  <div id="toolbar">
+    <button id="backBtn" class="action-btn" onclick="returnToMenu()">← Back to Hub</button>
+  </div>
 
-  <!-- Menu that shows after entering the password -->
+  <!-- Main Arcade Menu Panel -->
   <div id="menu">
     <canvas id="goldRainCanvas"></canvas>
-
     <div class="menu-content">
-      <div class="welcome-text">Welcome to GOLDDUUD's arcade</div>
-      <h1>Where do you want to go?</h1>
-      <button class="btn" onclick="navigateTo('https://frogiesarcade.net')">Frogies Arcade</button>
-      <button class="btn" onclick="navigateTo('https://ixl.ad')">Kiwi Games</button>
-      <button class="btn" onclick="navigateTo('https://photopea.com')">PhotoPea</button>
-      <button class="btn" onclick="navigateTo('https://html5.gamedistribution.com/cee36dd2c4f34d5797921a49bb1d4b83/')">RoofTop Run</button>
+      <div class="welcome-text">GOLDDUUD's Arcade</div>
+      <h1>Select a Platform Zone</h1>
+      
+      <div class="game-grid">
+        <div class="game-card" onclick="navigateTo('https://frogiesarcade.net')">
+          <span class="game-icon">🐸</span>
+          <div class="game-title">Frogies Arcade</div>
+          <div class="game-desc">Jump straight into custom community web games and classics.</div>
+        </div>
+        <div class="game-card" onclick="navigateTo('https://ixl.ad')">
+          <span class="game-icon">🥝</span>
+          <div class="game-title">Kiwi Games</div>
+          <div class="game-desc">Explore alternative lightweight retro projects.</div>
+        </div>
+        <div class="game-card" onclick="navigateTo('https://photopea.com')">
+          <span class="game-icon">🎨</span>
+          <div class="game-title">PhotoPea Editor</div>
+          <div class="game-desc">Full suite graphic and pixel art designer inside the browser.</div>
+        </div>
+        <div class="game-card" onclick="navigateTo('https://gamedistribution.com')">
+          <span class="game-icon">🏃</span>
+          <div class="game-title">RoofTop Run</div>
+          <div class="game-desc">High octane speed performance run action platformer.</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <iframe id="siteFrame" src=""></iframe>
 
+  <!-- Externalized Scripts to keep file size lightweight -->
+  <script src="https://jsdelivr.net" defer></script>
   <script>
-    // 3. SECURITY UPGRADE: Scrambled the password so it isn't plain text in the file.
-    // The actual password is still: 122014
-    const secureHash = btoa("122014"); 
+    const TARGET_HASH = "b4c29adbb7874251e6b359f12d4d98dc0045479be9398642050f2fb28b49e625";
 
-    function submitPassword() {
-      var passwordInput = document.getElementById("passInput").value;
-      if (btoa(passwordInput) === secureHash) {
+    async function sha256(string) {
+      const utf8 = new TextEncoder().encode(string);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function submitPassword() {
+      const input = document.getElementById("passInput").value;
+      const errorDiv = document.getElementById("errorMsg");
+      if ((await sha256(input)) === TARGET_HASH) {
         document.getElementById("passwordOverlay").style.display = "none";
       } else {
-        alert("Incorrect password.");
-        window.location.href = "about:blank"; 
+        errorDiv.innerText = "Access Denied. Invalid Passcode.";
+        document.getElementById("passInput").value = "";
       }
     }
 
-    function checkPasswordKey(event) {
-      if (event.key === "Enter") {
-        submitPassword();
-      }
-    }
+    function checkPasswordKey(event) { if (event.key === "Enter") submitPassword(); }
 
     function navigateTo(url) {
       document.getElementById('menu').style.display = 'none'; 
-      document.getElementById('backBtn').style.display = 'block'; // Show return button
+      document.getElementById('backBtn').style.display = 'block'; 
       var iframe = document.getElementById('siteFrame');
-      iframe.src = url;                                       
-      iframe.style.display = 'block';                        
+      iframe.src = url; iframe.style.display = 'block';                        
     }
 
-    // UI Upgrade: Clears iframe and unhides the gold menu
     function returnToMenu() {
       document.getElementById('siteFrame').style.display = 'none';
       document.getElementById('siteFrame').src = ''; 
       document.getElementById('backBtn').style.display = 'none';
       document.getElementById('menu').style.display = 'flex';
     }
-
-    // --- GOLD BLOCKS RAIN ANIMATION ENGINE ---
-    const canvas = document.getElementById('goldRainCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const blocks = [];
-    const blockCount = 50; 
-    const goldColors = ['#ffd700', '#d4af37', '#aa7c11', '#ffdf00', '#f3cd44'];
-
-    for (let i = 0; i < blockCount; i++) {
-      blocks.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        size: Math.random() * 12 + 6,         
-        speed: Math.random() * 3 + 1.5,       
-        color: goldColors[Math.floor(Math.random() * goldColors.length)],
-        opacity: Math.random() * 0.5 + 0.3    
-      });
-    }
-
-    function drawRain() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      blocks.forEach(block => {
-        ctx.fillStyle = block.color;
-        ctx.globalAlpha = block.opacity;
-        
-        ctx.fillRect(block.x, block.y, block.size, block.size);
-        block.y += block.speed;
-
-        if (block.y > canvas.height) {
-          block.y = -block.size;
-          block.x = Math.random() * canvas.width;
-          block.speed = Math.random() * 3 + 1.5;
-        }
-      });
-
-      ctx.globalAlpha = 1.0; 
-      requestAnimationFrame(drawRain);
-    }
-
-    drawRain();
   </script>
 </body>
 </html>
