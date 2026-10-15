@@ -3,84 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clever Designs | Premium Arcade Hub</title>
+  <title>Clever Designs | Ultimate Arcade Hub</title>
+  
+  <!-- Premium Fonts & Icons -->
+  <link href="https://googleapis.com" rel="stylesheet">
+  <link rel="stylesheet" href="https://cloudflare.com">
   
   <style>
     :root {
-      --gold-bright: #ffdf00; --gold-dark: #aa7c11; --gold-mid: #d4af37;
-      --bg-dark: #0a0a0a; --card-bg: rgba(25, 25, 25, 0.75);
+      --gold-neon: #ffdf00; --gold-dim: #d4af37; --gold-dark: #aa7c11;
+      --bg-dark: #050505; --card-bg: rgba(15, 15, 15, 0.7);
     }
-    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-dark); color: #ffffff; }
-    iframe { width: 100%; height: 100%; border: none; display: none; background-color: var(--bg-dark); }
-    #menu { position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; height: 100%; width: 100%; background: linear-gradient(-45deg, #050505, #5c4308, #1a1403, #0d0d0d); background-size: 400% 400%; animation: goldWave 15s ease infinite; overflow-y: auto; box-sizing: border-box; padding: 40px 20px; }
-    @keyframes goldWave { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    #goldRainCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-    .menu-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; margin: auto; }
-    .welcome-text { font-size: 38px; font-weight: 900; color: #ffffff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px var(--gold-bright), 0 0 30px var(--gold-mid); text-align: center; }
-    h1 { margin-top: 0; margin-bottom: 40px; color: #b5b5b5; font-size: 18px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; text-align: center; }
-    .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; width: 100%; padding: 10px; box-sizing: border-box; }
-    .game-card { background: var(--card-bg); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; overflow: hidden; }
-    .game-card:hover { transform: translateY(-8px); border-color: var(--gold-bright); box-shadow: 0 12px 30px rgba(255, 223, 0, 0.2); }
-    .game-icon { font-size: 42px; margin-bottom: 15px; display: inline-block; }
-    .game-title { font-size: 20px; font-weight: 750; color: var(--gold-bright); margin-bottom: 8px; }
-    .game-desc { font-size: 13px; color: #a0a0a0; line-height: 1.4; }
-    #toolbar { position: fixed; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; z-index: 10000; pointer-events: none; }
-    .action-btn { padding: 10px 20px; font-size: 14px; cursor: pointer; border: 1.5px solid var(--gold-mid); border-radius: 30px; background-color: rgba(10, 10, 10, 0.9); color: var(--gold-bright); font-weight: bold; transition: all 0.3s ease; pointer-events: auto; text-transform: uppercase; letter-spacing: 1px; }
-    .action-btn:hover { background-color: var(--gold-mid); color: #000000; box-shadow: 0 0 15px var(--gold-bright); transform: scale(1.05); }
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; font-family: 'Rajdhani', sans-serif; background-color: var(--bg-dark); color: #ffffff; }
+    iframe { width: 100%; height: 100%; border: none; display: none; background-color: var(--bg-dark); position: relative; z-index: 5; }
+    
+    #menu { position: relative; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; height: 100%; width: 100%; background: radial-gradient(circle at center, #2c1f03 0%, var(--bg-dark) 80%); overflow-y: auto; box-sizing: border-box; padding: 60px 20px; z-index: 10; }
+    #goldRainCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.4; }
+    .menu-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1100px; margin: auto; }
+    
+    .logo-container { margin-bottom: 20px; position: relative; }
+    .arcade-logo { width: 110px; height: 110px; border-radius: 50%; border: 3px solid var(--gold-neon); box-shadow: 0 0 25px var(--gold-dark), inset 0 0 15px var(--gold-neon); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .arcade-logo:hover { transform: scale(1.15) rotate(7deg); box-shadow: 0 0 40px var(--gold-neon); }
+
+    .welcome-text { font-family: 'Orbitron', sans-serif; font-size: 42px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; background: linear-gradient(to bottom, #ffffff 30%, var(--gold-neon) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(255,223,0,0.3); text-align: center; margin-bottom: 5px; }
+    h1 { margin-top: 0; margin-bottom: 50px; color: #888; font-size: 16px; font-weight: 500; letter-spacing: 4px; text-transform: uppercase; text-align: center; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; width: 100%; padding: 10px; box-sizing: border-box; }
+    .game-card { background: var(--card-bg); border: 1px solid rgba(255, 223, 0, 0.15); border-radius: 20px; padding: 40px 25px; text-align: center; cursor: pointer; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 15px 35px rgba(0,0,0,0.6); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; overflow: hidden; }
+    .game-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(to right, transparent, var(--gold-neon), transparent); transform: scaleX(0); transition: transform 0.4s ease; }
+    .game-card:hover { transform: translateY(-10px); border-color: var(--gold-neon); box-shadow: 0 20px 40px rgba(255, 223, 0, 0.15), 0 0 20px rgba(214, 175, 55, 0.1); }
+    .game-card:hover::after { transform: scaleX(1); }
+    .game-icon { font-size: 46px; color: #ffffff; margin-bottom: 20px; transition: transform 0.3s ease; display: inline-block; text-shadow: 0 0 15px var(--gold-dark); }
+    .game-card:hover .game-icon { transform: scale(1.2); color: var(--gold-neon); }
+    .game-title { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; letter-spacing: 1px; }
+    .game-desc { font-size: 14px; color: #999; line-height: 1.5; font-weight: 500; }
+    
+    #toolbar { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 30px; box-sizing: border-box; z-index: 10000; pointer-events: none; }
+    .action-btn { padding: 12px 26px; font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--gold-dim); border-radius: 8px; background: rgba(5, 5, 5, 0.85); color: var(--gold-neon); transition: all 0.3s ease; pointer-events: auto; letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+    .action-btn:hover { background: var(--gold-neon); color: #000; box-shadow: 0 0 25px var(--gold-neon); transform: translateY(-2px); }
     #backBtn { display: none; }
-    #passwordOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #050505; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    .pass-box { background: rgba(18, 18, 18, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); padding: 40px; border-radius: 24px; text-align: center; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 20px 50px rgba(0,0,0,0.7); max-width: 340px; width: 85%; }
-    .pass-box label { color: #ffffff; font-size: 20px; font-weight: 700; display: block; margin-bottom: 8px; }
-    .pass-sublabel { color: #888; font-size: 13px; margin-bottom: 25px; }
-    .pass-box input { padding: 14px; font-size: 18px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.5); background: rgba(30, 30, 30, 0.6); color: #fff; text-align: center; outline: none; margin-bottom: 10px; width: 100%; box-sizing: border-box; letter-spacing: 4px; }
-    #errorMsg { color: #ff4a4a; font-size: 13px; margin-top: 8px; min-height: 18px; }
+    
+    #passwordOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1a1202 0%, #020202 100%); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .pass-box { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 223, 0, 0.2); padding: 50px 40px; border-radius: 28px; text-align: center; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 25px 60px rgba(0,0,0,0.8); max-width: 360px; width: 85%; }
+    .pass-box label { font-family: 'Orbitron', sans-serif; color: #ffffff; font-size: 22px; font-weight: 900; display: block; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 10px var(--gold-dark); }
+    .pass-sublabel { color: #666; font-size: 13px; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+    .input-wrapper { position: relative; width: 100%; margin-bottom: 12px; }
+    .pass-box input { padding: 16px 20px; font-size: 20px; border-radius: 12px; border: 1px solid rgba(255, 223, 0, 0.3); background: rgba(20, 20, 20, 0.6); color: #fff; text-align: center; outline: none; width: 100%; box-sizing: border-box; font-family: 'Orbitron', sans-serif; letter-spacing: 6px; transition: border-color 0.3s; }
+    .pass-box input:focus { border-color: var(--gold-neon); box-shadow: 0 0 15px rgba(255, 223, 0, 0.25); }
+    #errorMsg { color: #ff4444; font-size: 13px; margin-top: 10px; min-height: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   </style>
 </head>
 <body>
 
-  <!-- Password Screen Overlay -->
   <div id="passwordOverlay">
     <div class="pass-box">
-      <label>Clever Designs</label>
-      <div class="pass-sublabel">Enter passcode to unlock arcade hub</div>
-      <input type="password" id="passInput" onkeydown="checkPasswordKey(event)" autofocus>
+      <label>System Access</label>
+      <div class="pass-sublabel">Clever Designs Node</div>
+      <div class="input-wrapper">
+        <input type="password" id="passInput" onkeydown="checkPasswordKey(event)" autofocus placeholder="••••••">
+      </div>
       <div id="errorMsg"></div>
-      <button class="action-btn" style="width: 100%; margin-top: 15px; padding: 14px;" onclick="submitPassword()">Unlock Access</button>
+      <button class="action-btn" style="width: 100%; margin-top: 20px; padding: 16px;" onclick="submitPassword()">Initialize Core</button>
     </div>
   </div>
 
-  <!-- Navigation Toolbar -->
   <div id="toolbar">
-    <button id="backBtn" class="action-btn" onclick="returnToMenu()">← Back to Hub</button>
+    <button id="backBtn" class="action-btn" onclick="returnToMenu()"><i class="fa-solid fa-angle-left"></i> Return to Hub</button>
   </div>
-
-  <!-- Main Arcade Menu Panel -->
   <div id="menu">
     <canvas id="goldRainCanvas"></canvas>
     <div class="menu-content">
+      
+      <div class="logo-container">
+        <img class="arcade-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJLR0QA/wD/AP+gvaeTAAAHVklEQVR4nO2bXWwUVRTHz72zuzvd7bZ0+9G2FEoFpC0gEExMhFjxQRM1AR801hcTEyMxGg2J+GBiYmIkPhijDz4YH4wmPhhNjMZETdQETRQSapBSaEv5aKGlW7bbbne7s7sz44O7tEuptN12t7tL95fMZHbu3Dnnn/ubM/fcc8H1Oh7yv6v/0QMgEAgEAgH/R3g8Hk9nC72vQo42+uO/cblceZ7OFsJAIBAIBAJBIBAIBAKBQCAQCFxPyH1O1uVyvSzGe/t3k/vK5XKVyHEZGeu3xWjD/y/f1v2T/3rA137Y3+f/Y01vWzO/Z472M65/5xN+MkaP+c0L3/v/6v/+Z29bH/2pI/w8H/j1wG8HfpYPfOun98vW/aM/7Xf9z/u5GvjlwC8HfjrwU0f42Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/wA2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/A2Ww+1B/43gV8O/Adf96H+P/rTh/wL142f3ui+0eN65ae97sPX7a96D/3P+13/835q/uEPrv1B/g3gY9vGj98bXz2eW0euO86/cd346Y3uGz2uV37a6z583f6q99D/vN/1P+/n/ .logo-container { margin-top: 20px; margin-bottom: 10px; display: flex; justify-content: center; z-index: 10; } .arcade-logo { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--gold-mid); box-shadow: 0 0 15px rgba(255, 223, 0, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; } .arcade-logo:hover { transform: scale(1.1) rotate(5deg); border-color: var(--gold-bright); box-shadow: 0 0 25px var(--gold-bright); } " alt="Avatar Logo Header">
+      </div>
+
       <div class="welcome-text">GOLDDUUD's Arcade</div>
       <h1>Select a Platform Zone</h1>
       
       <div class="game-grid">
         <div class="game-card" onclick="navigateTo('https://frogiesarcade.net')">
-          <span class="game-icon">🐸</span>
+          <span class="game-icon"><i class="fa-solid fa-frog"></i></span>
           <div class="game-title">Frogies Arcade</div>
-          <div class="game-desc">Jump straight into custom community web games and classics.</div>
+          <div class="game-desc">Launch premium decentralized web games and legacy arcade structures.</div>
         </div>
         <div class="game-card" onclick="navigateTo('https://ixl.ad')">
-          <span class="game-icon">🥝</span>
+          <span class="game-icon"><i class="fa-solid fa-kiwi-bird"></i></span>
           <div class="game-title">Kiwi Games</div>
-          <div class="game-desc">Explore alternative lightweight retro projects.</div>
+          <div class="game-desc">Access high-speed micro projects and retro logical layouts.</div>
         </div>
         <div class="game-card" onclick="navigateTo('https://photopea.com')">
-          <span class="game-icon">🎨</span>
-          <div class="game-title">PhotoPea Editor</div>
-          <div class="game-desc">Full suite graphic and pixel art designer inside the browser.</div>
+          <span class="game-icon"><i class="fa-solid fa-palette"></i></span>
+          <div class="game-title">PhotoPea Node</div>
+          <div class="game-desc">Execute serverless graphics vector editing tools inside your view window.</div>
         </div>
         <div class="game-card" onclick="navigateTo('https://gamedistribution.com')">
-          <span class="game-icon">🏃</span>
+          <span class="game-icon"><i class="fa-solid fa-person-running"></i></span>
           <div class="game-title">RoofTop Run</div>
-          <div class="game-desc">High octane speed performance run action platformer.</div>
+          <div class="game-desc">Initiate immediate performance action platform response scripts.</div>
         </div>
       </div>
     </div>
@@ -88,24 +107,17 @@
 
   <iframe id="siteFrame" src=""></iframe>
 
-  <!-- Externalized Scripts to keep file size lightweight -->
   <script src="https://jsdelivr.net" defer></script>
   <script>
-    const TARGET_HASH = "45e20765ea840e086ee49236f0f5aec7e218683d634dcb960b8a772de96daf72";
+    const SECRET_KEY = ["12", "20", "14"].join("");
 
-    async function sha256(string) {
-      const utf8 = new TextEncoder().encode(string);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function submitPassword() {
-      const input = document.getElementById("passInput").value;
+    function submitPassword() {
+      const input = document.getElementById("passInput").value.trim();
       const errorDiv = document.getElementById("errorMsg");
-      if ((await sha256(input)) === TARGET_HASH) {
+      if (input === SECRET_KEY) {
         document.getElementById("passwordOverlay").style.display = "none";
       } else {
-        errorDiv.innerText = "Access Denied. Invalid Passcode.";
+        errorDiv.innerText = "Access Denied. System Locked.";
         document.getElementById("passInput").value = "";
       }
     }
